@@ -7,9 +7,10 @@ namespace OceanMoon\Core\Tests;
 use ArgumentCountError;
 use DomainException;
 use OceanMoon\Core\Console;
+use OceanMoon\Core\Tests\Fixtures\Foo;
+use OceanMoon\Core\Tests\Fixtures\StringableThing;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Stringable;
 
 use const OceanMoon\Core\RECURSION;
 
@@ -27,73 +28,95 @@ final class ConsoleTest extends TestCase
         $this->console = new Console();
     }
 
-    #region Method setBackground() tests.
+    #region Method foreground() tests.
 
     /**
-     * Test setBackground() emits the background code (foreground code + 10) and tracks it, leaving the
-     * foreground untouched.
+     * Test foreground() emits the foreground code and tracks it, leaving the background untouched.
      */
-    public function testSetBackground(): void
-    {
-        $this->expectOutputString("\033[41m");
-        $this->console->setBackground(Console::RED);
-        $this->assertSame(Console::RED, $this->console->getStyle()['background']);
-        $this->assertSame(Console::DEFAULT, $this->console->getStyle()['foreground']);
-    }
-
-    #endregion
-
-    #region Method setColor() tests.
-
-    /**
-     * Test setColor() with only a foreground emits just the foreground code, leaving the background untouched.
-     */
-    public function testSetColorForegroundOnly(): void
+    public function testForeground(): void
     {
         $this->expectOutputString("\033[97m");
-        $this->console->setColor(Console::WHITE);
+        $this->console->foreground(Console::WHITE);
         $style = $this->console->getStyle();
         $this->assertSame(Console::WHITE, $style['foreground']);
         $this->assertSame(Console::DEFAULT, $style['background']);
     }
 
     /**
-     * Test setColor() with both foreground and background emits two separate escape sequences (foreground via
-     * emit(), background via setBackground()) and tracks both.
+     * Test foreground() returns $this for chaining.
      */
-    public function testSetColorForegroundAndBackground(): void
+    public function testForegroundReturnsSelf(): void
+    {
+        $this->expectOutputRegex('/.+/');
+        $this->assertSame($this->console, $this->console->foreground(Console::WHITE));
+    }
+
+    #endregion
+
+    #region Method background() tests.
+
+    /**
+     * Test background() emits the background code (foreground code + 10) and tracks it, leaving the
+     * foreground untouched.
+     */
+    public function testBackground(): void
+    {
+        $this->expectOutputString("\033[41m");
+        $this->console->background(Console::RED);
+        $this->assertSame(Console::RED, $this->console->getStyle()['background']);
+        $this->assertSame(Console::DEFAULT, $this->console->getStyle()['foreground']);
+    }
+
+    /**
+     * Test background() returns $this for chaining.
+     */
+    public function testBackgroundReturnsSelf(): void
+    {
+        $this->expectOutputRegex('/.+/');
+        $this->assertSame($this->console, $this->console->background(Console::RED));
+    }
+
+    #endregion
+
+    #region Method colors() tests.
+
+    /**
+     * Test colors() emits two separate escape sequences (foreground via foreground(), background via
+     * background()) and tracks both.
+     */
+    public function testColors(): void
     {
         $this->expectOutputString("\033[97m\033[41m");
-        $this->console->setColor(Console::WHITE, Console::RED);
+        $this->console->colors(Console::WHITE, Console::RED);
         $style = $this->console->getStyle();
         $this->assertSame(Console::WHITE, $style['foreground']);
         $this->assertSame(Console::RED, $style['background']);
     }
 
     /**
-     * Test setColor() returns $this for chaining.
+     * Test colors() returns $this for chaining.
      */
-    public function testSetColorReturnsSelf(): void
+    public function testColorsReturnsSelf(): void
     {
         $this->expectOutputRegex('/.+/');
-        $this->assertSame($this->console, $this->console->setColor(Console::WHITE));
+        $this->assertSame($this->console, $this->console->colors(Console::WHITE, Console::DEFAULT));
     }
 
     #endregion
 
-    #region Method resetColor() tests.
+    #region Method resetColors() tests.
 
     /**
-     * Test resetColor() emits the console's default fg/bg codes (39/49) and resets tracked colours.
+     * Test resetColors() emits the console's default fg/bg codes (39/49) and resets tracked colours.
      */
-    public function testResetColor(): void
+    public function testResetColors(): void
     {
         ob_start();
-        $this->console->setColor(Console::WHITE, Console::RED);
+        $this->console->colors(Console::WHITE, Console::RED);
         ob_end_clean();
 
         $this->expectOutputString("\033[39m\033[49m");
-        $this->console->resetColor();
+        $this->console->resetColors();
         $style = $this->console->getStyle();
         $this->assertSame(Console::DEFAULT, $style['foreground']);
         $this->assertSame(Console::DEFAULT, $style['background']);
@@ -101,10 +124,11 @@ final class ConsoleTest extends TestCase
 
     #endregion
 
-    #region Bold/dim toggle tests.
+    #region Bold/dim attribute tests.
 
     /**
-     * Test bold()/dim() emit their own SGR codes (1/2) and track independent boolean state.
+     * Test bold()/dim() default to true, emitting their own SGR codes (1/2) and tracking independent boolean
+     * state.
      */
     public function testBoldAndDimOn(): void
     {
@@ -116,7 +140,7 @@ final class ConsoleTest extends TestCase
     }
 
     /**
-     * Test boldOff() while dim is still on: since SGR 22 clears both bold and dim, boldOff() must re-emit dim
+     * Test bold(false) while dim is still on: since SGR 22 clears both bold and dim, bold(false) must re-emit dim
      * (SGR 2) afterward so dim is left untouched from the caller's perspective.
      */
     public function testBoldOffPreservesDim(): void
@@ -126,14 +150,14 @@ final class ConsoleTest extends TestCase
         ob_end_clean();
 
         $this->expectOutputString("\033[22m\033[2m");
-        $this->console->boldOff();
+        $this->console->bold(false);
         $style = $this->console->getStyle();
         $this->assertFalse($style['bold']);
         $this->assertTrue($style['dim']);
     }
 
     /**
-     * Test dimOff() while bold is still on: mirrors testBoldOffPreservesDim(), re-emitting bold (SGR 1) after
+     * Test dim(false) while bold is still on: mirrors testBoldOffPreservesDim(), re-emitting bold (SGR 1) after
      * clearing intensity.
      */
     public function testDimOffPreservesBold(): void
@@ -143,14 +167,14 @@ final class ConsoleTest extends TestCase
         ob_end_clean();
 
         $this->expectOutputString("\033[22m\033[1m");
-        $this->console->dimOff();
+        $this->console->dim(false);
         $style = $this->console->getStyle();
         $this->assertTrue($style['bold']);
         $this->assertFalse($style['dim']);
     }
 
     /**
-     * Test boldOff()/dimOff() with neither the other attribute active just emits SGR 22 once, with no
+     * Test bold(false)/dim(false) with neither the other attribute active just emits SGR 22 once, with no
      * re-emitted attribute.
      */
     public function testBoldOffWithDimAlreadyOff(): void
@@ -160,7 +184,7 @@ final class ConsoleTest extends TestCase
         ob_end_clean();
 
         $this->expectOutputString("\033[22m");
-        $this->console->boldOff();
+        $this->console->bold(false);
         $style = $this->console->getStyle();
         $this->assertFalse($style['bold']);
         $this->assertFalse($style['dim']);
@@ -168,53 +192,57 @@ final class ConsoleTest extends TestCase
 
     #endregion
 
-    #region Simple attribute toggle tests.
+    #region Simple attribute tests.
 
     /**
-     * Test italic()/italicOff() emit SGR 3/23 and track state.
+     * Test italic()/italic(false) emit SGR 3/23 and track state; the true default means italic() alone turns it
+     * on.
      */
     public function testItalicToggle(): void
     {
         $this->expectOutputString("\033[3m\033[23m");
         $this->console->italic();
         $this->assertTrue($this->console->getStyle()['italic']);
-        $this->console->italicOff();
+        $this->console->italic(false);
         $this->assertFalse($this->console->getStyle()['italic']);
     }
 
     /**
-     * Test underline()/underlineOff() emit SGR 4/24 and track state.
+     * Test underline()/underline(false) emit SGR 4/24 and track state; the true default means underline() alone
+     * turns it on.
      */
     public function testUnderlineToggle(): void
     {
         $this->expectOutputString("\033[4m\033[24m");
         $this->console->underline();
         $this->assertTrue($this->console->getStyle()['underline']);
-        $this->console->underlineOff();
+        $this->console->underline(false);
         $this->assertFalse($this->console->getStyle()['underline']);
     }
 
     /**
-     * Test strikethrough()/strikethroughOff() emit SGR 9/29 and track state.
+     * Test strikethrough()/strikethrough(false) emit SGR 9/29 and track state; the true default means
+     * strikethrough() alone turns it on.
      */
     public function testStrikethroughToggle(): void
     {
         $this->expectOutputString("\033[9m\033[29m");
         $this->console->strikethrough();
         $this->assertTrue($this->console->getStyle()['strikethrough']);
-        $this->console->strikethroughOff();
+        $this->console->strikethrough(false);
         $this->assertFalse($this->console->getStyle()['strikethrough']);
     }
 
     /**
-     * Test reverse()/reverseOff() emit SGR 7/27 and track state.
+     * Test reverse()/reverse(false) emit SGR 7/27 and track state; the true default means reverse() alone turns
+     * it on.
      */
     public function testReverseToggle(): void
     {
         $this->expectOutputString("\033[7m\033[27m");
         $this->console->reverse();
         $this->assertTrue($this->console->getStyle()['reverse']);
-        $this->console->reverseOff();
+        $this->console->reverse(false);
         $this->assertFalse($this->console->getStyle()['reverse']);
     }
 
@@ -228,7 +256,7 @@ final class ConsoleTest extends TestCase
     public function testGetStyleReturnsCurrentState(): void
     {
         ob_start();
-        $this->console->setColor(Console::GREEN, Console::BLACK)->bold()->underline();
+        $this->console->colors(Console::GREEN, Console::BLACK)->bold()->underline();
         ob_end_clean();
 
         $this->assertSame([
@@ -250,7 +278,7 @@ final class ConsoleTest extends TestCase
     public function testSetStyleRoundTrip(): void
     {
         ob_start();
-        $this->console->setColor(Console::GREEN, Console::BLACK)->bold()->underline();
+        $this->console->colors(Console::GREEN, Console::BLACK)->bold()->underline();
         $snapshot = $this->console->getStyle();
         $this->console->resetStyle();
         ob_end_clean();
@@ -314,10 +342,7 @@ final class ConsoleTest extends TestCase
     public function testResetStyle(): void
     {
         ob_start();
-        $this->console->setColor(
-            Console::WHITE,
-            Console::RED
-        )->bold()->italic()->underline()->strikethrough()->reverse();
+        $this->console->colors(Console::WHITE, Console::RED)->bold()->italic()->underline()->strikethrough()->reverse();
         ob_end_clean();
 
         $this->expectOutputString("\033[0m");
@@ -340,15 +365,15 @@ final class ConsoleTest extends TestCase
     #region Method message() tests.
 
     /**
-     * Test message() with no colour arguments: bolds, re-emits the current (default) colour, prints the padded
-     * text, restores every attribute, and appends a newline.
+     * Test message() with no colour or bold arguments: turns bold off (the default state), re-emits the current
+     * (default) colour, prints the text, restores every attribute, and appends a newline.
      */
     public function testMessageWithNoColor(): void
     {
         $this->expectOutputString(
-            "\033[1m" // message() always bolds
-            . "\033[39m\033[49m" // setColor() with no override re-emits the current (default) colour
-            . ' hi '
+            "\033[22m" // bold(false ?? false), the default state
+            . "\033[39m\033[49m" // colors() with no override re-emits the current (default) colour
+            . 'hi'
             // The trailing newline comes from println() and is emitted here, before the style restore below —
             // print()'s per-line background-bleed fix doesn't apply since the background is still DEFAULT.
             . "\n"
@@ -369,9 +394,9 @@ final class ConsoleTest extends TestCase
     public function testMessageWithColor(): void
     {
         $this->expectOutputString(
-            "\033[1m"
+            "\033[22m" // bold(false ?? false), the default state
             . "\033[97m\033[41m" // WHITE on RED
-            . ' hi '
+            . 'hi'
             // println()'s trailing newline is embedded in the same print() call as the text, and since the
             // background is non-default here, print()'s per-line bleed-prevention fix wraps that embedded
             // newline with a background reset/reapply pair, before message()'s own final style restore runs.
@@ -387,6 +412,28 @@ final class ConsoleTest extends TestCase
             . "\033[27m"
         );
         $this->console->message('hi', Console::WHITE, Console::RED);
+    }
+
+    /**
+     * Test message() with an explicit bold argument applies it for the message only, then restores the prior
+     * bold state.
+     */
+    public function testMessageWithBold(): void
+    {
+        $this->expectOutputString(
+            "\033[1m" // bold(true)
+            . "\033[39m\033[49m"
+            . 'hi'
+            . "\n"
+            . "\033[39m\033[49m"
+            . "\033[22m" // restore bold off (the state before the call)
+            . "\033[22m"
+            . "\033[23m"
+            . "\033[24m"
+            . "\033[29m"
+            . "\033[27m"
+        );
+        $this->console->message('hi', bold: true);
     }
 
     /**
@@ -579,7 +626,9 @@ final class ConsoleTest extends TestCase
      */
     public function testPrintWithNonStringableObjectDoesNotThrow(): void
     {
-        $this->expectOutputRegex('/^OceanMoon\\\\Core\\\\Tests\\\\Foo #\d+ \{\+a => 1, #b => 2, -c => 3\}$/');
+        $this->expectOutputRegex(
+            '/^OceanMoon\\\\Core\\\\Tests\\\\Fixtures\\\\Foo #\d+ \{\+a => 1, #b => 2, -c => 3\}$/'
+        );
         $this->console->print(new Foo());
     }
 
@@ -599,7 +648,7 @@ final class ConsoleTest extends TestCase
     public function testPrintMultilineWithNonDefaultBackground(): void
     {
         ob_start();
-        $this->console->setBackground(Console::RED);
+        $this->console->background(Console::RED);
         ob_end_clean();
 
         $this->expectOutputString(
@@ -699,7 +748,7 @@ final class ConsoleTest extends TestCase
     public function testDumpVarWithObject(): void
     {
         $this->expectOutputRegex(
-            '/^\033\[96m\033\[49mobject: OceanMoon\\\\Core\\\\Tests\\\\Foo #\d+ \{\n'
+            '/^\033\[96m\033\[49mobject: OceanMoon\\\\Core\\\\Tests\\\\Fixtures\\\\Foo #\d+ \{\n'
             . '    \+a => 1,\n    #b => 2,\n    -c => 3,\n\}\n'
             . '\033\[39m\033\[49m\033\[22m\033\[22m\033\[23m\033\[24m\033\[29m\033\[27m$/'
         );
@@ -794,37 +843,4 @@ final class ConsoleTest extends TestCase
     }
 
     #endregion
-}
-
-/**
- * Test fixture with properties of every visibility, for object-stringification tests.
- */
-class Foo
-{
-    public int $a = 1;
-
-    protected int $b = 2;
-
-    private int $c = 3; // @phpstan-ignore property.onlyWritten
-}
-
-/**
- * Test fixture implementing Stringable, for testing the Stringable fast path in to_string().
- */
-class StringableThing implements Stringable
-{
-    public function __toString(): string
-    {
-        return 'custom';
-    }
-}
-
-/**
- * Test fixture enum, for testing enum handling in to_string().
- */
-enum Suit
-{
-    case Hearts;
-
-    case Spades;
 }

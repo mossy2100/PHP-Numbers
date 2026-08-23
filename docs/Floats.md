@@ -823,13 +823,13 @@ other parameters.
 - `$expFormat` (`ExponentFormat`) - Controls how an exponent, if present, is rendered. Default
   `ExponentFormat::UnicodeMath`.
 
-  | Case                              | Example (exponent 23)    |
+  | Case                              | Example (exponent 42)    |
   | --------------------------------- | ------------------------ |
-  | `ExponentFormat::AsciiLowerCaseE` | `e+23`                   |
-  | `ExponentFormat::AsciiUpperCaseE` | `E+23`                   |
-  | `ExponentFormat::AsciiMath`       | `*10^23`                 |
-  | `ExponentFormat::UnicodeMath`     | `×10²³` **Default.**     |
-  | `ExponentFormat::HtmlMath`        | `&times;10<sup>23</sup>` |
+  | `ExponentFormat::AsciiLowerCaseE` | `e+42`                   |
+  | `ExponentFormat::AsciiUpperCaseE` | `E+42`                   |
+  | `ExponentFormat::AsciiMath`       | `*10^42`                 |
+  | `ExponentFormat::UnicodeMath`     | `×10⁴²` **Default.**     |
+  | `ExponentFormat::HtmlMath`        | `&times;10<sup>42</sup>` |
 
 - `$roundingMode` (`RoundingMode`) - The rounding mode to use. Default `RoundingMode::HalfAwayFromZero`, matching
   `round()`, `Rational::round()`, and `Complex::round()`, rather than `sprintf()`'s round-half-to-even behavior.

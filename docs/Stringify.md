@@ -135,8 +135,9 @@ appropriate type-specific method.
 
 **Throws:**
 
-- `DomainException` - If the value cannot be stringified (e.g., arrays with circular references).
-- `UnexpectedValueException` - If the value has an unknown type (should never happen).
+- `DomainException` - If the value cannot be stringified (e.g., a string whose encoding can't be detected or
+  converted to UTF-8).
+- `UnexpectedValueException` - If the value has an unknown type (probably never happen).
 
 **Examples:**
 

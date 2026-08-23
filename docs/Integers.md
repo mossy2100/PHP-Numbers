@@ -332,7 +332,11 @@ Convert a string of Unicode subscript characters to an integer.
 
 **Returns:** `int` - The integer value
 
-**Throws:** [`FormatException`](Exceptions/FormatException.md) - If the string contains invalid subscript characters
+**Throws:**
+
+- [`FormatException`](Exceptions/FormatException.md) - If the string contains invalid subscript characters, or
+  doesn't represent an integer (e.g. it's empty, or just a minus sign with no digits).
+- `OverflowException` - If the value is outside the valid range for `int` (`PHP_INT_MIN` to `PHP_INT_MAX`).
 
 **Examples:**
 
@@ -344,6 +348,9 @@ Integers::fromSubscript('₅');     // 5
 
 Integers::fromSubscript('123');   // throws FormatException
 Integers::fromSubscript('¹²³');   // throws FormatException
+Integers::fromSubscript('');      // throws FormatException
+Integers::fromSubscript('₋');     // throws FormatException (minus sign with no digits)
+Integers::fromSubscript('₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉'); // throws OverflowException
 ```
 
 **Note:** Use `isSubscript()` to validate input before calling this method if you need to handle invalid input
@@ -363,7 +370,11 @@ Convert a string of Unicode superscript characters to an integer.
 
 **Returns:** `int` - The integer value
 
-**Throws:** [`FormatException`](Exceptions/FormatException.md) - If the string contains invalid superscript characters
+**Throws:**
+
+- [`FormatException`](Exceptions/FormatException.md) - If the string contains invalid superscript characters, or
+  doesn't represent an integer (e.g. it's empty, or just a minus sign with no digits).
+- `OverflowException` - If the value is outside the valid range for `int` (`PHP_INT_MIN` to `PHP_INT_MAX`).
 
 **Examples:**
 
@@ -375,6 +386,9 @@ Integers::fromSuperscript('⁵');     // 5
 
 Integers::fromSuperscript('123');   // throws FormatException
 Integers::fromSuperscript('₁₂₃');   // throws FormatException
+Integers::fromSuperscript('');      // throws FormatException
+Integers::fromSuperscript('⁻');     // throws FormatException (minus sign with no digits)
+Integers::fromSuperscript('⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹'); // throws OverflowException
 ```
 
 **Note:** Use `isSuperscript()` to validate input before calling this method if you need to handle invalid input

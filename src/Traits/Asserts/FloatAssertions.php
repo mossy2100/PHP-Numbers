@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OceanMoon\Core\Traits\Asserts;
 
 use OceanMoon\Core\Floats;
+use PHPUnit\Framework\AssertionFailedError;
 
 /**
  * Trait providing PHPUnit assertions for approximate floating-point equality.
@@ -52,6 +53,7 @@ trait FloatAssertions
      * @param float $relTol The maximum allowed relative difference.
      * @param float $absTol The maximum allowed absolute difference.
      * @param string $message Optional custom failure message.
+     * @throws AssertionFailedError If $expected and $actual are not approximately equal within tolerance.
      */
     public function assertApproxEqual(
         float $expected,
@@ -68,7 +70,8 @@ trait FloatAssertions
         }
 
         $diff = abs($expected - $actual);
-        $relDiff = $expected !== 0.0 ? abs($diff / $expected) : INF;
+        $maxMagnitude = max(abs($expected), abs($actual));
+        $relDiff = $maxMagnitude !== 0.0 ? $diff / $maxMagnitude : INF;
 
         $defaultMessage = sprintf(
             "Failed asserting that %.15g approximately equals %.15g.\n" .

@@ -653,6 +653,51 @@ final class ArraysTest extends TestCase
         Arrays::toSerialList(['foo', 42, 'bar']); // @phpstan-ignore argument.type
     }
 
+    /**
+     * Test toSerialList with oxford set to false omits the Oxford comma.
+     */
+    public function testToSerialListWithoutOxfordComma(): void
+    {
+        $this->assertSame(
+            'apples, oranges and bananas',
+            Arrays::toSerialList(['apples', 'oranges', 'bananas'], oxford: false)
+        );
+        $this->assertSame(
+            'apples, oranges, bananas and grapes',
+            Arrays::toSerialList(['apples', 'oranges', 'bananas', 'grapes'], oxford: false)
+        );
+
+        // Oxford comma has no effect with fewer than three items.
+        $this->assertSame('apples and oranges', Arrays::toSerialList(['apples', 'oranges'], oxford: false));
+    }
+
+    /**
+     * Test toSerialList with an associative array normalizes to a list before formatting.
+     */
+    public function testToSerialListAssociativeArray(): void
+    {
+        $this->assertSame('apples', Arrays::toSerialList([
+            'a' => 'apples',
+        ]));
+
+        $this->assertSame(
+            'apples and oranges',
+            Arrays::toSerialList([
+                'a' => 'apples',
+                'b' => 'oranges',
+            ])
+        );
+
+        $this->assertSame(
+            'apples, oranges, and bananas',
+            Arrays::toSerialList([
+                'a' => 'apples',
+                'b' => 'oranges',
+                'c' => 'bananas',
+            ])
+        );
+    }
+
     #endregion
 
     #region Method removeValue() tests.

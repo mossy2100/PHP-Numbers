@@ -23,7 +23,7 @@ exponent as a string in the case's style.
 case AsciiLowerCaseE;
 ```
 
-ASCII lower-case `e` notation (e.g. `'e+23'`). The exponent is not padded to a fixed width, and the sign is always
+ASCII lower-case `e` notation (e.g. `'e+42'`). The exponent is not padded to a fixed width, and the sign is always
 included.
 
 ### AsciiUpperCaseE
@@ -32,7 +32,7 @@ included.
 case AsciiUpperCaseE;
 ```
 
-ASCII upper-case `E` notation (e.g. `'E+23'`). The exponent is not padded to a fixed width, and the sign is always
+ASCII upper-case `E` notation (e.g. `'E+42'`). The exponent is not padded to a fixed width, and the sign is always
 included — matching the scientific notation PHP itself falls back to when casting a float to string (e.g.
 `(string) 1.5e20 === '1.5E+20'`).
 
@@ -42,7 +42,7 @@ included — matching the scientific notation PHP itself falls back to when cast
 case AsciiMath;
 ```
 
-ASCII mathematical notation (e.g. `'*10^23'`). Uses ASCII operators and digits.
+ASCII mathematical notation (e.g. `'*10^42'`). Uses ASCII operators and digits.
 
 ### UnicodeMath
 
@@ -50,7 +50,7 @@ ASCII mathematical notation (e.g. `'*10^23'`). Uses ASCII operators and digits.
 case UnicodeMath;
 ```
 
-Unicode mathematical notation (e.g. `'×10²³'`). Uses the multiplication sign and superscript digits. This is
+Unicode mathematical notation (e.g. `'×10⁴²'`). Uses the multiplication sign and superscript digits. This is
 `Floats::format()`'s default.
 
 ### HtmlMath
@@ -59,7 +59,7 @@ Unicode mathematical notation (e.g. `'×10²³'`). Uses the multiplication sign 
 case HtmlMath;
 ```
 
-HTML mathematical notation (e.g. `'&times;10<sup>23</sup>'`).
+HTML mathematical notation (e.g. `'&times;10<sup>42</sup>'`).
 
 ---
 
@@ -67,11 +67,11 @@ HTML mathematical notation (e.g. `'&times;10<sup>23</sup>'`).
 
 | Case              | Example                  |
 | ----------------- | ------------------------ |
-| `AsciiLowerCaseE` | `e+23`                   |
-| `AsciiUpperCaseE` | `E+23`                   |
-| `AsciiMath`       | `*10^23`                 |
-| `UnicodeMath`     | `×10²³` **Default.**     |
-| `HtmlMath`        | `&times;10<sup>23</sup>` |
+| `AsciiLowerCaseE` | `e+42`                   |
+| `AsciiUpperCaseE` | `E+42`                   |
+| `AsciiMath`       | `*10^42`                 |
+| `UnicodeMath`     | `×10⁴²` **Default.**     |
+| `HtmlMath`        | `&times;10<sup>42</sup>` |
 
 ---
 
@@ -97,19 +97,19 @@ exponents and show only `'-'` for negative ones, matching how scientific notatio
 
 **Returns:**
 
-- `string` — The rendered exponent, e.g. `'e+23'`, `'E-23'`, `'*10^23'`, `'×10²³'`, `'&times;10<sup>23</sup>'`.
+- `string` — The rendered exponent, e.g. `'e+42'`, `'E-42'`, `'*10^42'`, `'×10⁴²'`, `'&times;10<sup>42</sup>'`.
 
 **Examples:**
 
 ```php
 use OceanMoon\Core\Enums\ExponentFormat;
 
-ExponentFormat::AsciiLowerCaseE->format(23);   // 'e+23'
-ExponentFormat::AsciiUpperCaseE->format(-23);  // 'E-23'
-ExponentFormat::AsciiMath->format(23);         // '*10^23'
-ExponentFormat::UnicodeMath->format(23);       // '×10²³'
-ExponentFormat::UnicodeMath->format(-23);      // '×10⁻²³' (no '+' for positive, only '-' for negative)
-ExponentFormat::HtmlMath->format(23);          // '&times;10<sup>23</sup>'
+ExponentFormat::AsciiLowerCaseE->format(42);   // 'e+42'
+ExponentFormat::AsciiUpperCaseE->format(-42);  // 'E-42'
+ExponentFormat::AsciiMath->format(42);         // '*10^42'
+ExponentFormat::UnicodeMath->format(42);       // '×10⁴²'
+ExponentFormat::UnicodeMath->format(-42);      // '×10⁻⁴²' (no '+' for positive, only '-' for negative)
+ExponentFormat::HtmlMath->format(42);          // '&times;10<sup>42</sup>'
 ```
 
 ---

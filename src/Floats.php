@@ -302,7 +302,7 @@ final class Floats
      *
      * This method satisfies the identity x = Floats::trunc(x) + Floats::frac(x), even for non-finite numbers.
      *
-     * For result will have the same sign as the input value. For example:
+     * The result will have the same sign as the input value. For example:
      * - Floats::frac(3.7) → 0.7
      * - Floats::frac(-3.7) → -0.7
      *

@@ -15,7 +15,7 @@ Every method echoes its escape code immediately and returns `$this`, so calls ch
 
 ```php
 $console = new Console();
-$console->setColor(Console::WHITE, Console::RED)->bold();
+$console->colors(Console::WHITE, Console::RED)->bold();
 echo ' ALERT ';
 $console->resetStyle();
 ```
@@ -44,7 +44,7 @@ the user's terminal theme — this is standard ANSI behavior, not something `Con
 
 Each names one of the terminal's 16 standard palette slots (the "normal intensity" 30–37 range, and the
 "bright"/high-intensity 90–97 range), plus `DEFAULT` for the terminal's own default color. Pass any of these to
-`setColor()`/`setBackground()`.
+`foreground()`/`background()`/`colors()`.
 
 | Constant         | Value | Notes                                            |
 | ---------------- | ----- | ------------------------------------------------ |
@@ -66,7 +66,7 @@ Each names one of the terminal's 16 standard palette slots (the "normal intensit
 | `WHITE`          | `97`  | a.k.a. "bright silver".                          |
 | `DEFAULT`        | `39`  | Sentinel for "the terminal's own default color". |
 
-All constants are foreground-space values. `setBackground()` applies the `+10` offset (e.g. `31` → `41`) internally at
+All constants are foreground-space values. `background()` applies the `+10` offset (e.g. `31` → `41`) internally at
 emit time — you never need to add it yourself.
 
 ### TYPE_COLOR
@@ -79,7 +79,7 @@ Maps each of `Types::getBasicType()`'s type names to a default `Console` color c
 color a value by its type; look it up directly if you want the same color scheme elsewhere.
 
 | Type       | Color            | Notes                         |
-| ---------- | ---------------- | ----------------------------- |
+| ---------- | ---------------- | ------------------------------ |
 | `null`     | `SILVER`         | Muted grey, for "absence".    |
 | `bool`     | `BRIGHT_YELLOW`  |                               |
 | `int`      | `BRIGHT_BLUE`    |                               |
@@ -96,34 +96,26 @@ color a value by its type; look it up directly if you want the same color scheme
 
 ## Color Methods
 
-### setColor()
+### foreground()
 
 ```php
-public function setColor(int $foreground, ?int $background = null): self
+public function foreground(int $foreground): self
 ```
 
-Set the foreground color and, optionally, the background color at the same time.
+Set just the foreground color.
 
 **Parameters:**
 
 - `$foreground` (`int`) - A `Console` color constant.
-- `$background` (`?int`) - A `Console` color constant, or `null` (default) to leave the background unchanged.
 
 **Returns:**
 
 - `self` - Returns `$this` for chaining.
 
-**Examples:**
+### background()
 
 ```php
-new Console()->setColor(Console::RED);
-new Console()->setColor(Console::WHITE, Console::RED);
-```
-
-### setBackground()
-
-```php
-public function setBackground(int $background): self
+public function background(int $background): self
 ```
 
 Set just the background color.
@@ -136,14 +128,38 @@ Set just the background color.
 
 - `self` - Returns `$this` for chaining.
 
-### resetColor()
+### colors()
 
 ```php
-public function resetColor(): self
+public function colors(int $foreground, int $background): self
+```
+
+Set the foreground and background colors together.
+
+**Parameters:**
+
+- `$foreground` (`int`) - A `Console` color constant.
+- `$background` (`int`) - A `Console` color constant.
+
+**Returns:**
+
+- `self` - Returns `$this` for chaining.
+
+**Examples:**
+
+```php
+new Console()->foreground(Console::RED);
+new Console()->colors(Console::WHITE, Console::RED);
+```
+
+### resetColors()
+
+```php
+public function resetColors(): self
 ```
 
 Return both the foreground and background colors to the terminal's defaults. Equivalent to
-`setColor(Console::DEFAULT, Console::DEFAULT)`.
+`colors(Console::DEFAULT, Console::DEFAULT)`.
 
 **Returns:**
 
@@ -153,65 +169,108 @@ Return both the foreground and background colors to the terminal's defaults. Equ
 
 ## Attribute Methods
 
-Each attribute has an `on` method and an `Off()` counterpart. All return `$this` for chaining.
+Each attribute method takes a `bool` parameter that defaults to `true`, so calling it with no arguments turns the
+attribute on; pass `false` to turn it off. All return `$this` for chaining.
 
-### bold() / boldOff()
+### bold()
 
 ```php
-public function bold(): self
-public function boldOff(): self
+public function bold(bool $bold = true): self
 ```
 
 Turn bold text on or off.
 
-`boldOff()` is aware of `dim`: there's no SGR code to clear bold alone, only one that clears bold and dim together, so
-`boldOff()` re-applies dim afterwards if it was still active — from the caller's perspective, only bold is affected.
+There's no SGR code to clear bold alone, only one that clears bold and dim together, so `bold(false)` re-applies dim
+afterwards if it was still active — from the caller's perspective, only bold is affected.
 
-### dim() / dimOff()
+**Parameters:**
+
+- `$bold` (`bool`) - `true` (default) to turn bold on, `false` to turn it off.
+
+**Returns:**
+
+- `self` - Returns `$this` for chaining.
+
+### dim()
 
 ```php
-public function dim(): self
-public function dimOff(): self
+public function dim(bool $dim = true): self
 ```
 
-Turn dim (faint) text on or off. `dimOff()` is the mirror image of `boldOff()`: it re-applies bold afterwards if it was
-still active, so only dim is affected from the caller's perspective.
+Turn dim (faint) text on or off. `dim(false)` is the mirror image of `bold(false)`: it re-applies bold afterwards if it
+was still active, so only dim is affected from the caller's perspective.
 
-### italic() / italicOff()
+**Parameters:**
+
+- `$dim` (`bool`) - `true` (default) to turn dim on, `false` to turn it off.
+
+**Returns:**
+
+- `self` - Returns `$this` for chaining.
+
+### italic()
 
 ```php
-public function italic(): self
-public function italicOff(): self
+public function italic(bool $italic = true): self
 ```
 
 Turn italic text on or off.
 
-### underline() / underlineOff()
+**Parameters:**
+
+- `$italic` (`bool`) - `true` (default) to turn italic on, `false` to turn it off.
+
+**Returns:**
+
+- `self` - Returns `$this` for chaining.
+
+### underline()
 
 ```php
-public function underline(): self
-public function underlineOff(): self
+public function underline(bool $underline = true): self
 ```
 
 Turn underlined text on or off.
 
-### strikethrough() / strikethroughOff()
+**Parameters:**
+
+- `$underline` (`bool`) - `true` (default) to turn underline on, `false` to turn it off.
+
+**Returns:**
+
+- `self` - Returns `$this` for chaining.
+
+### strikethrough()
 
 ```php
-public function strikethrough(): self
-public function strikethroughOff(): self
+public function strikethrough(bool $strikethrough = true): self
 ```
 
 Turn strikethrough text on or off.
 
-### reverse() / reverseOff()
+**Parameters:**
+
+- `$strikethrough` (`bool`) - `true` (default) to turn strikethrough on, `false` to turn it off.
+
+**Returns:**
+
+- `self` - Returns `$this` for chaining.
+
+### reverse()
 
 ```php
-public function reverse(): self
-public function reverseOff(): self
+public function reverse(bool $reverse = true): self
 ```
 
 Turn reverse video (swap foreground and background colors) on or off.
+
+**Parameters:**
+
+- `$reverse` (`bool`) - `true` (default) to turn reverse video on, `false` to turn it off.
+
+**Returns:**
+
+- `self` - Returns `$this` for chaining.
 
 ---
 
@@ -254,7 +313,7 @@ value is `false`.
 $console = new Console();
 $saved = $console->getStyle();
 
-$console->setColor(Console::RED)->bold();
+$console->foreground(Console::RED)->bold();
 $console->println('important');
 
 $console->setStyle($saved); // Restores the exact prior style.
@@ -342,11 +401,11 @@ new Console()->dump(['a' => 1]); // "array: ['a' => 1]", in TYPE_COLOR['array']
 ### message()
 
 ```php
-public function message(string $text, ?int $foreground = null, ?int $background = null): self
+public function message(string $text, ?int $foreground = null, ?int $background = null, ?bool $bold = null): self
 ```
 
-Print a bold message, optionally in a one-off color, with the prior style restored afterwards. The severity helpers
-below (`success()`, `error()`, `warn()`, `info()`) are all thin wrappers around this.
+Print a message, optionally in a one-off color and/or bold state, with the prior style restored afterwards. The
+severity helpers below (`success()`, `error()`, `warn()`, `info()`) are all thin wrappers around this.
 
 **Parameters:**
 
@@ -355,6 +414,7 @@ below (`success()`, `error()`, `warn()`, `info()`) are all thin wrappers around 
   foreground unchanged.
 - `$background` (`?int`) - A `Console` color constant for the message only. `null` (default) leaves the current
   background unchanged.
+- `$bold` (`?bool`) - The bold state for the message only. `null` (default) leaves the current bold state unchanged.
 
 **Returns:**
 
@@ -369,7 +429,8 @@ public function warn(string $text): self
 public function info(string $text): self
 ```
 
-Print a glyph-prefixed message at a fixed severity level and color pairing, restoring the prior style afterwards.
+Print a glyph-prefixed, padded, bold message at a fixed severity level and color pairing, restoring the prior style
+afterwards.
 
 | Method      | Glyph | Colors                 | Severity                                                             |
 | ----------- | ----- | ---------------------- | -------------------------------------------------------------------- |

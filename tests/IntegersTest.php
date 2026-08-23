@@ -582,6 +582,44 @@ final class IntegersTest extends TestCase
         Integers::fromSubscript('123');
     }
 
+    /**
+     * Test fromSubscript throws exception for an empty string.
+     */
+    public function testFromSubscriptEmptyString(): void
+    {
+        $this->expectException(FormatException::class);
+        $this->expectExceptionMessage('does not represent an integer');
+        Integers::fromSubscript('');
+    }
+
+    /**
+     * Test fromSubscript throws exception for a lone minus sign with no digits.
+     */
+    public function testFromSubscriptLoneMinusSign(): void
+    {
+        $this->expectException(FormatException::class);
+        $this->expectExceptionMessage('does not represent an integer');
+        Integers::fromSubscript('₋');
+    }
+
+    /**
+     * Test fromSubscript throws OverflowException instead of silently saturating for out-of-range values.
+     */
+    public function testFromSubscriptOverflow(): void
+    {
+        $this->expectException(OverflowException::class);
+        Integers::fromSubscript('₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉₉');
+    }
+
+    /**
+     * Test fromSubscript at the PHP_INT_MIN/PHP_INT_MAX boundaries.
+     */
+    public function testFromSubscriptIntBoundaries(): void
+    {
+        $this->assertSame(PHP_INT_MAX, Integers::fromSubscript(Integers::toSubscript(PHP_INT_MAX)));
+        $this->assertSame(PHP_INT_MIN, Integers::fromSubscript(Integers::toSubscript(PHP_INT_MIN)));
+    }
+
     #endregion
 
     #region Method fromSuperscript() tests.
@@ -634,6 +672,44 @@ final class IntegersTest extends TestCase
         Integers::fromSuperscript('123');
     }
 
+    /**
+     * Test fromSuperscript throws exception for an empty string.
+     */
+    public function testFromSuperscriptEmptyString(): void
+    {
+        $this->expectException(FormatException::class);
+        $this->expectExceptionMessage('does not represent an integer');
+        Integers::fromSuperscript('');
+    }
+
+    /**
+     * Test fromSuperscript throws exception for a lone minus sign with no digits.
+     */
+    public function testFromSuperscriptLoneMinusSign(): void
+    {
+        $this->expectException(FormatException::class);
+        $this->expectExceptionMessage('does not represent an integer');
+        Integers::fromSuperscript('⁻');
+    }
+
+    /**
+     * Test fromSuperscript throws OverflowException instead of silently saturating for out-of-range values.
+     */
+    public function testFromSuperscriptOverflow(): void
+    {
+        $this->expectException(OverflowException::class);
+        Integers::fromSuperscript('⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹');
+    }
+
+    /**
+     * Test fromSuperscript at the PHP_INT_MIN/PHP_INT_MAX boundaries.
+     */
+    public function testFromSuperscriptIntBoundaries(): void
+    {
+        $this->assertSame(PHP_INT_MAX, Integers::fromSuperscript(Integers::toSuperscript(PHP_INT_MAX)));
+        $this->assertSame(PHP_INT_MIN, Integers::fromSuperscript(Integers::toSuperscript(PHP_INT_MIN)));
+    }
+
     #endregion
 
     #region Round-trip tests.
@@ -662,6 +738,21 @@ final class IntegersTest extends TestCase
             $result = Integers::fromSuperscript($superscript);
             $this->assertSame($value, $result);
         }
+    }
+
+    /**
+     * Test that fromSubscript() and fromSuperscript() give correct results when interleaved.
+     *
+     * Regression test: fromSubscript() and fromSuperscript() share a private helper with a character-map cache
+     * keyed by conversion style. Calling them in alternating order previously returned stale results from
+     * whichever character map was cached first.
+     */
+    public function testSubscriptAndSuperscriptInterleaved(): void
+    {
+        $this->assertSame(123, Integers::fromSuperscript('¹²³'));
+        $this->assertSame(456, Integers::fromSubscript('₄₅₆'));
+        $this->assertSame(-789, Integers::fromSuperscript('⁻⁷⁸⁹'));
+        $this->assertSame(-321, Integers::fromSubscript('₋₃₂₁'));
     }
 
     #endregion

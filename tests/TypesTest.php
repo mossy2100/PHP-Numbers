@@ -6,36 +6,18 @@ namespace OceanMoon\Core\Tests;
 
 use DateTime;
 use DomainException;
+use OceanMoon\Core\Tests\Fixtures\ChildClassUsingTrait;
+use OceanMoon\Core\Tests\Fixtures\ClassNotUsingTrait;
+use OceanMoon\Core\Tests\Fixtures\ClassUsingNestedTrait;
+use OceanMoon\Core\Tests\Fixtures\ClassUsingTrait;
+use OceanMoon\Core\Tests\Fixtures\NestedTrait;
+use OceanMoon\Core\Tests\Fixtures\TestColor;
+use OceanMoon\Core\Tests\Fixtures\TestSuit;
+use OceanMoon\Core\Tests\Fixtures\TestTrait;
 use OceanMoon\Core\Types;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-
-/**
- * Test enum for getBasicType() tests.
- */
-enum TestSuit
-{
-    case Hearts;
-
-    case Diamonds;
-
-    case Clubs;
-
-    case Spades;
-}
-
-/**
- * Test backed enum for getBasicType() tests.
- */
-enum TestColor: string
-{
-    case Red = 'red';
-
-    case Green = 'green';
-
-    case Blue = 'blue';
-}
 
 /**
  * Test class for Types utility class.
@@ -274,7 +256,7 @@ final class TypesTest extends TestCase
     {
         // Test that unit enums produce keys with class and case name.
         $key = Types::getUniqueString(TestSuit::Hearts);
-        $this->assertSame('e:OceanMoon\Core\Tests\TestSuit::Hearts', $key);
+        $this->assertSame('e:OceanMoon\Core\Tests\Fixtures\TestSuit::Hearts', $key);
 
         // Test that different cases produce different keys.
         $key2 = Types::getUniqueString(TestSuit::Diamonds);
@@ -286,7 +268,7 @@ final class TypesTest extends TestCase
 
         // Test with a backed enum.
         $key4 = Types::getUniqueString(TestColor::Red);
-        $this->assertSame('e:OceanMoon\Core\Tests\TestColor::Red', $key4);
+        $this->assertSame('e:OceanMoon\Core\Tests\Fixtures\TestColor::Red', $key4);
 
         // Test that enums from different classes are distinct.
         $this->assertNotSame($key, $key4);
@@ -674,55 +656,4 @@ final class TypesTest extends TestCase
     }
 
     #endregion
-}
-
-// Test fixtures for trait testing.
-
-/**
- * Test trait for trait detection tests.
- */
-trait TestTrait
-{
-    public function testMethod(): string
-    {
-        return 'test';
-    }
-}
-
-/**
- * Nested trait that uses another trait.
- */
-trait NestedTrait
-{
-    use TestTrait;
-}
-
-/**
- * Class that uses a trait.
- */
-class ClassUsingTrait
-{
-    use TestTrait;
-}
-
-/**
- * Class that doesn't use any traits.
- */
-class ClassNotUsingTrait
-{
-}
-
-/**
- * Child class that inherits trait usage from parent.
- */
-class ChildClassUsingTrait extends ClassUsingTrait
-{
-}
-
-/**
- * Class that uses a trait which itself uses another trait.
- */
-class ClassUsingNestedTrait
-{
-    use NestedTrait;
 }

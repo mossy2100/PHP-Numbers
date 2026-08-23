@@ -129,6 +129,11 @@ final class Numbers
     /**
      * Copy the sign of one number to another.
      *
+     * If $num is integer PHP_INT_MIN and $signSource is positive, the result will be a float, because abs(PHP_INT_MIN)
+     * can't be expressed as an int.
+     *
+     * In all other cases, the result will have the same type as $num.
+     *
      * @param int|float $num The number whose magnitude to use.
      * @param int|float $signSource The number whose sign to copy.
      * @return int|float The magnitude of $num with the sign of $signSource.
@@ -141,7 +146,14 @@ final class Numbers
             throw new DomainException('Cannot copy sign to or from NAN.');
         }
 
-        return abs($num) * self::sign($signSource, false);
+        $sign = self::sign($signSource, false);
+
+        // If the num is PHP_INT_MIN and sign is negative, return an int by avoiding the call to abs().
+        if ($num === PHP_INT_MIN && $sign === -1) {
+            return PHP_INT_MIN;
+        }
+
+        return abs($num) * $sign;
     }
 
     #endregion

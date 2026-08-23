@@ -40,6 +40,9 @@ Asserts that two floating-point values are approximately equal within specified 
 - `$absTol` (float) - Absolute tolerance (default: PHP_FLOAT_EPSILON ≈ 2.22e-16)
 - `$message` (string) - Optional custom failure message prefix
 
+**Throws:** `PHPUnit\Framework\AssertionFailedError` - If `$expected` and `$actual` are not approximately equal within
+tolerance.
+
 **Failure Message:**
 
 When the assertion fails, it produces an informative message:
@@ -47,7 +50,7 @@ When the assertion fails, it produces an informative message:
 ```
 Failed asserting that 2.71828 approximately equals 3.14159.
 Absolute difference: 0.42331 (tolerance: 2.22044604925031e-16)
-Relative difference: 0.134802795673498 (tolerance: 1.0e-9)
+Relative difference: 0.13474387173374 (tolerance: 1.0e-9)
 ```
 
 ---
@@ -124,8 +127,8 @@ This produces on failure:
 ```
 Force calculation for 1kg at Earth gravity
 Failed asserting that 9.75 approximately equals 9.80665.
-Absolute difference: 0.05665 (tolerance: 0.0001)
-Relative difference: 0.00577706070688632 (tolerance: 1.0e-9)
+Absolute difference: 0.0566499999999994 (tolerance: 0.0001)
+Relative difference: 0.0057766923465199 (tolerance: 1.0e-9)
 ```
 
 ---
@@ -145,7 +148,7 @@ $this->assertTrue(Floats::approxEqual(3.14159, $result));
 $this->assertApproxEqual(3.14159, $result);
 // Failure: "Failed asserting that 2.71828 approximately equals 3.14159.
 //          Absolute difference: 0.42331 (tolerance: 2.22044604925031e-16)
-//          Relative difference: 0.134802795673498 (tolerance: 1.0e-9)"
+//          Relative difference: 0.13474387173374 (tolerance: 1.0e-9)"
 ```
 
 ---

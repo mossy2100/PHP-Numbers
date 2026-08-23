@@ -8,9 +8,10 @@ use ArgumentCountError;
 use BadMethodCallException;
 use DomainException;
 use OceanMoon\Core\Stringify;
-use OceanMoon\Core\Tests\Foo;
-use OceanMoon\Core\Tests\StringableThing;
-use OceanMoon\Core\Tests\Suit;
+use OceanMoon\Core\Tests\Fixtures\Foo;
+use OceanMoon\Core\Tests\Fixtures\StringableThing;
+use OceanMoon\Core\Tests\Fixtures\StringifyAbbrevAnObjectWithAVeryVeryLongClassNameIndeed;
+use OceanMoon\Core\Tests\Fixtures\Suit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -129,7 +130,7 @@ final class StringifyMainTest extends TestCase
      */
     public function testToStringWithEnum(): void
     {
-        $this->assertSame('OceanMoon\Core\Tests\Suit::Hearts', Stringify::toString(Suit::Hearts));
+        $this->assertSame('OceanMoon\Core\Tests\Fixtures\Suit::Hearts', Stringify::toString(Suit::Hearts));
     }
 
     /**
@@ -142,7 +143,7 @@ final class StringifyMainTest extends TestCase
         $result = Stringify::toString(new Foo());
 
         $this->assertMatchesRegularExpression(
-            '/^OceanMoon\\\\Core\\\\Tests\\\\Foo #\d+ \{\+a => 1, #b => 2, -c => 3\}$/',
+            '/^OceanMoon\\\\Core\\\\Tests\\\\Fixtures\\\\Foo #\d+ \{\+a => 1, #b => 2, -c => 3\}$/',
             $result
         );
     }
@@ -305,12 +306,4 @@ final class StringifyMainTest extends TestCase
     }
 
     #endregion
-}
-
-/**
- * Test fixture with a deliberately long class name, for abbrev()'s class-name-preservation tests.
- */
-class StringifyAbbrevAnObjectWithAVeryVeryLongClassNameIndeed
-{
-    public int $a = 1;
 }

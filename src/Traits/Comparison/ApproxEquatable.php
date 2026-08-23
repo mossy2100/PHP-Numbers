@@ -23,9 +23,6 @@ use OceanMoon\Core\Floats;
  * @see Equatable The base equality trait this includes.
  * @see ApproxComparable For types with both ordering and approximate equality.
  * @see Floats::approxEqual() The algorithm to use for tolerance checking.
- *
- * @codeCoverageIgnore
- * @phpstan-ignore trait.unused
  */
 trait ApproxEquatable
 {

@@ -19,7 +19,7 @@ final class Integers
     /**
      * Unicode subscript characters for digits and minus sign.
      *
-     * @var array<non-numeric-string, string>
+     * @var array<array-key, string>
      */
     public const array SUBSCRIPT_CHARACTERS = [
         '-' => '₋',
@@ -38,7 +38,7 @@ final class Integers
     /**
      * Unicode superscript characters for digits and minus sign.
      *
-     * @var array<non-numeric-string, string>
+     * @var array<array-key, string>
      */
     public const array SUPERSCRIPT_CHARACTERS = [
         '-' => '⁻',
@@ -295,27 +295,12 @@ final class Integers
      *
      * @param string $s The subscript string to convert (e.g., ₁₂₃ → 123, ₋₅ → -5).
      * @return int The integer value.
-     * @throws FormatException If the string contains invalid subscript characters.
+     * @throws FormatException If the string does not represent an integer.
+     * @throws OverflowException If the value is outside the valid range for int.
      */
     public static function fromSubscript(string $s): int
     {
-        // Create reverse mapping.
-        static $reverseMap = null;
-        if ($reverseMap === null) {
-            $reverseMap = array_flip(self::SUBSCRIPT_CHARACTERS);
-        }
-
-        // Convert each character.
-        $result = '';
-        $chars = mb_str_split($s);
-        foreach ($chars as $char) {
-            if (!isset($reverseMap[$char])) {
-                throw new FormatException("Invalid subscript character: $char.");
-            }
-            $result .= $reverseMap[$char];
-        }
-
-        return (int) $result;
+        return self::fromSubSuper($s, 'subscript', self::SUBSCRIPT_CHARACTERS);
     }
 
     /**
@@ -323,27 +308,64 @@ final class Integers
      *
      * @param string $s The superscript string to convert (e.g., ¹²³ → 123, ⁻⁵ → -5).
      * @return int The integer value.
-     * @throws FormatException If the string contains invalid superscript characters.
+     * @throws FormatException If the string does not represent an integer.
+     * @throws OverflowException If the value is outside the valid range for int.
      */
     public static function fromSuperscript(string $s): int
     {
-        // Create reverse mapping.
-        static $reverseMap = null;
-        if ($reverseMap === null) {
-            $reverseMap = array_flip(self::SUPERSCRIPT_CHARACTERS);
+        return self::fromSubSuper($s, 'superscript', self::SUPERSCRIPT_CHARACTERS);
+    }
+
+    #endregion
+
+    #region Helper methods
+
+    /**
+     * Shared implementation for fromSubscript() and fromSuperscript().
+     *
+     * Converts a string of Unicode subscript or superscript characters to an integer, by mapping each character
+     * back to its plain-digit (or minus sign) equivalent, validating the resulting string represents an integer,
+     * and converting it while checking for overflow.
+     *
+     * @param string $s The subscript or superscript string to convert.
+     * @param string $style Either 'subscript' or 'superscript'; used in exception messages only.
+     * @param array<array-key, string> $charMap The character map to use (SUBSCRIPT_CHARACTERS or
+     *   SUPERSCRIPT_CHARACTERS).
+     * @return int The integer value.
+     * @throws FormatException If the string does not represent an integer.
+     * @throws OverflowException If the value is outside the valid range for int.
+     */
+    private static function fromSubSuper(string $s, string $style, array $charMap): int
+    {
+        // Create reverse mapping. Cached per style, since this method is shared between subscript and superscript.
+        static $reverseMaps = [];
+        if (!isset($reverseMaps[$style])) {
+            $reverseMaps[$style] = array_flip($charMap);
         }
+        $reverseMap = $reverseMaps[$style];
 
         // Convert each character.
-        $result = '';
+        $intString = '';
         $chars = mb_str_split($s);
         foreach ($chars as $char) {
             if (!isset($reverseMap[$char])) {
-                throw new FormatException("Invalid superscript character: $char.");
+                throw new FormatException("Invalid $style character: $char.");
             }
-            $result .= $reverseMap[$char];
+            $intString .= $reverseMap[$char];
         }
 
-        return (int) $result;
+        // Check format.
+        if (preg_match('/^-?\d+$/', $intString) === 0) {
+            throw new FormatException("String '$intString' does not represent an integer.");
+        }
+
+        // Convert to int and check for overflow.
+        $result = filter_var($intString, FILTER_VALIDATE_INT);
+        if ($result === false) {
+            throw new OverflowException("Integer $intString is outside valid range.");
+        }
+
+        return $result;
     }
 
     #endregion

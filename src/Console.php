@@ -15,12 +15,12 @@ use DomainException;
  *
  * ```php
  * $t = new Console();
- * $t->setColor(Console::WHITE, Console::RED)->bold();
+ * $t->colors(Console::WHITE, Console::RED)->bold();
  * echo ' ALERT ';
  * $t->resetStyle();
  * ```
  *
- * State: setColor()/resetColor() and the *On()/*Off() methods keep the properties below in sync.
+ * State: colors()/resetColors() and the attribute methods keep the properties below in sync.
  * - getStyle() returns a detached snapshot;
  * - setStyle() re-applies one.
  *
@@ -71,8 +71,8 @@ class Console
     private const int BACKGROUND_OFFSET = 10;
 
     /*
-     * SGR attribute on/off codes, used internally by the toggle methods below. Not exposed publicly — callers use
-     * the *On()/*Off() methods rather than raw SGR numbers.
+     * SGR attribute on/off codes, used internally by the attribute methods below. Not exposed publicly — callers
+     * use those methods (e.g. bold(), italic()) rather than raw SGR numbers.
      */
     private const int BOLD_ON = 1;
     private const int DIM_ON = 2;
@@ -134,34 +134,40 @@ class Console
     #region Color methods
 
     /**
+     * Set just the foreground color. Pass any color constant.
+     *
+     * @param int $foreground The foreground color constant.
+     * @return self Returns $this for chaining.
+     */
+    public function foreground(int $foreground): self
+    {
+        $this->foreground = $foreground;
+        return $this->emit($foreground);
+    }
+
+    /**
      * Set just the background color. Pass any color constant.
      *
      * @param int $background The background color constant.
      * @return self Returns $this for chaining.
      */
-    public function setBackground(int $background): self
+    public function background(int $background): self
     {
         $this->background = $background;
         return $this->emit($background + self::BACKGROUND_OFFSET);
     }
 
     /**
-     * Set foreground and optionally also the background color. Pass any color constants.
+     * Set foreground and background colors together. Pass any color constants.
      *
      * @param int $foreground The foreground color constant.
-     * @param ?int $background The background color constant (optional).
+     * @param int $background The background color constant.
      * @return self Returns $this for chaining.
      */
-    public function setColor(int $foreground, ?int $background = null): self
+    public function colors(int $foreground, int $background): self
     {
-        // Set the foreground color.
-        $this->foreground = $foreground;
-        $this->emit($foreground);
-
-        // Set the background color if specified.
-        if ($background !== null) {
-            $this->setBackground($background);
-        }
+        $this->foreground($foreground);
+        $this->background($background);
 
         // Return $this for chaining.
         return $this;
@@ -172,9 +178,9 @@ class Console
      *
      * @return self Returns $this for chaining.
      */
-    public function resetColor(): self
+    public function resetColors(): self
     {
-        return $this->setColor(self::DEFAULT, self::DEFAULT);
+        return $this->colors(self::DEFAULT, self::DEFAULT);
     }
 
     #endregion
@@ -182,27 +188,21 @@ class Console
     #region Attribute methods
 
     /**
-     * Turn on bold text.
+     * Turn bold text on or off.
      *
+     * There's no SGR code to clear bold alone — only INTENSITY_OFF (22), which clears both bold and dim. So turning
+     * bold off emits that, then re-emits dim if it was still active, to leave dim untouched from the caller's
+     * perspective.
+     *
+     * @param bool $bold True (default) to turn bold on, false to turn it off.
      * @return self Returns $this for chaining.
      */
-    public function bold(): self
+    public function bold(bool $bold = true): self
     {
-        $this->bold = true;
-        return $this->emit(self::BOLD_ON);
-    }
-
-    /**
-     * Turn off bold text.
-     *
-     * There's no SGR code to clear bold alone — only INTENSITY_OFF (22), which clears both bold and dim. So this
-     * emits that, then re-emits dim if it was still active, to leave dim untouched from the caller's perspective.
-     *
-     * @return self Returns $this for chaining.
-     */
-    public function boldOff(): self
-    {
-        $this->bold = false;
+        $this->bold = $bold;
+        if ($bold) {
+            return $this->emit(self::BOLD_ON);
+        }
         $this->emit(self::INTENSITY_OFF);
         if ($this->dim) {
             $this->emit(self::DIM_ON);
@@ -211,27 +211,21 @@ class Console
     }
 
     /**
-     * Turn on dim (faint) text.
+     * Turn dim (faint) text on or off.
      *
+     * There's no SGR code to clear dim alone — only INTENSITY_OFF (22), which clears both bold and dim. So turning
+     * dim off emits that, then re-emits bold if it was still active, to leave bold untouched from the caller's
+     * perspective.
+     *
+     * @param bool $dim True (default) to turn dim on, false to turn it off.
      * @return self Returns $this for chaining.
      */
-    public function dim(): self
+    public function dim(bool $dim = true): self
     {
-        $this->dim = true;
-        return $this->emit(self::DIM_ON);
-    }
-
-    /**
-     * Turn off dim (faint) text.
-     *
-     * There's no SGR code to clear dim alone — only INTENSITY_OFF (22), which clears both bold and dim. So this
-     * emits that, then re-emits bold if it was still active, to leave bold untouched from the caller's perspective.
-     *
-     * @return self Returns $this for chaining.
-     */
-    public function dimOff(): self
-    {
-        $this->dim = false;
+        $this->dim = $dim;
+        if ($dim) {
+            return $this->emit(self::DIM_ON);
+        }
         $this->emit(self::INTENSITY_OFF);
         if ($this->bold) {
             $this->emit(self::BOLD_ON);
@@ -240,91 +234,51 @@ class Console
     }
 
     /**
-     * Turn on italic text.
+     * Turn italic text on or off.
      *
+     * @param bool $italic True (default) to turn italic on, false to turn it off.
      * @return self Returns $this for chaining.
      */
-    public function italic(): self
+    public function italic(bool $italic = true): self
     {
-        $this->italic = true;
-        return $this->emit(self::ITALIC_ON);
+        $this->italic = $italic;
+        return $this->emit($italic ? self::ITALIC_ON : self::ITALIC_OFF);
     }
 
     /**
-     * Turn off italic text.
+     * Turn underlined text on or off.
      *
+     * @param bool $underline True (default) to turn underline on, false to turn it off.
      * @return self Returns $this for chaining.
      */
-    public function italicOff(): self
+    public function underline(bool $underline = true): self
     {
-        $this->italic = false;
-        return $this->emit(self::ITALIC_OFF);
+        $this->underline = $underline;
+        return $this->emit($underline ? self::UNDERLINE_ON : self::UNDERLINE_OFF);
     }
 
     /**
-     * Turn on underlined text.
+     * Turn strikethrough text on or off.
      *
+     * @param bool $strikethrough True (default) to turn strikethrough on, false to turn it off.
      * @return self Returns $this for chaining.
      */
-    public function underline(): self
+    public function strikethrough(bool $strikethrough = true): self
     {
-        $this->underline = true;
-        return $this->emit(self::UNDERLINE_ON);
+        $this->strikethrough = $strikethrough;
+        return $this->emit($strikethrough ? self::STRIKETHROUGH_ON : self::STRIKETHROUGH_OFF);
     }
 
     /**
-     * Turn off underlined text.
+     * Turn reverse video (swap foreground and background colors) on or off.
      *
+     * @param bool $reverse True (default) to turn reverse video on, false to turn it off.
      * @return self Returns $this for chaining.
      */
-    public function underlineOff(): self
+    public function reverse(bool $reverse = true): self
     {
-        $this->underline = false;
-        return $this->emit(self::UNDERLINE_OFF);
-    }
-
-    /**
-     * Turn on strikethrough text.
-     *
-     * @return self Returns $this for chaining.
-     */
-    public function strikethrough(): self
-    {
-        $this->strikethrough = true;
-        return $this->emit(self::STRIKETHROUGH_ON);
-    }
-
-    /**
-     * Turn off strikethrough text.
-     *
-     * @return self Returns $this for chaining.
-     */
-    public function strikethroughOff(): self
-    {
-        $this->strikethrough = false;
-        return $this->emit(self::STRIKETHROUGH_OFF);
-    }
-
-    /**
-     * Turn on reverse video (swap foreground and background colors).
-     *
-     * @return self Returns $this for chaining.
-     */
-    public function reverse(): self
-    {
-        $this->reverse = true;
-        return $this->emit(self::REVERSE_ON);
-    }
-
-    /**
-     * Turn off reverse video.
-     *
-     * @return self Returns $this for chaining.
-     */
-    public function reverseOff(): self
-    {
-        $this->reverse = false;
-        return $this->emit(self::REVERSE_OFF);
+        $this->reverse = $reverse;
+        return $this->emit($reverse ? self::REVERSE_ON : self::REVERSE_OFF);
     }
 
     #endregion
@@ -379,26 +333,29 @@ class Console
      */
     public function setStyle(array $style): self
     {
-        if (isset($style['foreground']) || isset($style['background'])) {
-            $this->setColor($style['foreground'] ?? $this->foreground, $style['background'] ?? $this->background);
+        if (isset($style['foreground'])) {
+            $this->foreground($style['foreground']);
+        }
+        if (isset($style['background'])) {
+            $this->background($style['background']);
         }
         if (isset($style['bold'])) {
-            $style['bold'] ? $this->bold() : $this->boldOff();
+            $this->bold($style['bold']);
         }
         if (isset($style['dim'])) {
-            $style['dim'] ? $this->dim() : $this->dimOff();
+            $this->dim($style['dim']);
         }
         if (isset($style['italic'])) {
-            $style['italic'] ? $this->italic() : $this->italicOff();
+            $this->italic($style['italic']);
         }
         if (isset($style['underline'])) {
-            $style['underline'] ? $this->underline() : $this->underlineOff();
+            $this->underline($style['underline']);
         }
         if (isset($style['strikethrough'])) {
-            $style['strikethrough'] ? $this->strikethrough() : $this->strikethroughOff();
+            $this->strikethrough($style['strikethrough']);
         }
         if (isset($style['reverse'])) {
-            $style['reverse'] ? $this->reverse() : $this->reverseOff();
+            $this->reverse($style['reverse']);
         }
 
         return $this;
@@ -493,32 +450,33 @@ class Console
     {
         $style = $this->getStyle();
         $type = Types::getBasicType($value);
-        return $this->setColor(self::TYPE_COLOR[$type] ?? self::GRAY, self::DEFAULT)
+        return $this->colors(self::TYPE_COLOR[$type] ?? self::GRAY, self::DEFAULT)
                     ->println("$type: " . Stringify::stringify($value, true))
                     ->setStyle($style);
     }
 
     /**
-     * Print text to the console, optionally changing the foreground and/or background color for the message only.
+     * Print text to the console, optionally changing the foreground/background color and bold state for the
+     * message only.
      *
-     * If an alternate color is specified, the text style will be restored to the previous state after the message is
-     * printed.
+     * The text style will be restored to the initial state after the message is printed.
      *
      * @param string $text The message text.
      * @param ?int $foreground The message's foreground color. Null (default) leaves it unchanged.
      * @param ?int $background The message's background color. Null (default) leaves it unchanged.
+     * @param ?bool $bold The message's bold state. Null (default) leaves it unchanged.
      * @return self Returns $this for chaining.
      */
-    public function message(string $text, ?int $foreground = null, ?int $background = null): self
+    public function message(string $text, ?int $foreground = null, ?int $background = null, ?bool $bold = null): self
     {
         // Remember the current style.
         $style = $this->getStyle();
 
         // Set the message style.
-        $this->bold()->setColor($foreground ?? $this->foreground, $background ?? $this->background);
+        $this->bold($bold ?? $this->bold)->colors($foreground ?? $this->foreground, $background ?? $this->background);
 
-        // Emit message with padding.
-        $this->println(" $text ");
+        // Emit message.
+        $this->println($text);
 
         // Restore the original style.
         return $this->setStyle($style);
@@ -534,7 +492,7 @@ class Console
      */
     public function success(string $text): self
     {
-        return $this->message(self::GLYPH_SUCCESS . " $text", self::WHITE, self::GREEN);
+        return $this->message(' ' . self::GLYPH_SUCCESS . " $text ", self::WHITE, self::GREEN, true);
     }
 
     /**
@@ -548,7 +506,7 @@ class Console
      */
     public function error(string $text): self
     {
-        return $this->message(self::GLYPH_ERROR . " $text ", self::WHITE, self::RED);
+        return $this->message(' ' . self::GLYPH_ERROR . " $text ", self::WHITE, self::RED, true);
     }
 
     /**
@@ -562,7 +520,7 @@ class Console
      */
     public function warn(string $text): self
     {
-        return $this->message(self::GLYPH_WARN . " $text", self::BLACK, self::BRIGHT_YELLOW);
+        return $this->message(' ' . self::GLYPH_WARN . " $text ", self::BLACK, self::BRIGHT_YELLOW, true);
     }
 
     /**
@@ -576,7 +534,7 @@ class Console
      */
     public function info(string $text): self
     {
-        return $this->message(self::GLYPH_INFO . " $text", self::WHITE, self::BLUE);
+        return $this->message(' ' . self::GLYPH_INFO . " $text ", self::WHITE, self::BLUE, true);
     }
 
     /**
@@ -593,11 +551,10 @@ class Console
         $label = $text !== '' ? $text : $url;
         $style = $this->getStyle();
 
-        $this->setColor(self::BRIGHT_BLUE, self::DEFAULT)->underline();
+        $this->colors(self::BRIGHT_BLUE, self::DEFAULT)->underline();
 
-        echo self::ESC . self::OSC8 . $url . self::ESC . self::ST
-           . $label
-           . self::ESC . self::OSC8 . self::ESC . self::ST;
+        echo self::ESC . self::OSC8 . $url . self::ESC . self::ST . $label . self::ESC . self::OSC8 . self::ESC
+            . self::ST;
 
         return $this->setStyle($style);
     }

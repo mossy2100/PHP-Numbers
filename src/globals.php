@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Useful constants and functions that work better as global.
+ * Useful constants that work better as global.
  */
 
 declare(strict_types=1);

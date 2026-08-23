@@ -20,7 +20,8 @@ enum FloatFormat
     case Scientific;
 
     /**
-     * Use whichever of FixedPoint or Scientific produces the more compact string.
+     * Use whichever of FixedPoint or Scientific produces the more useful string: the one with more significant
+     * figures, unless that comes with too many leading or trailing zeros.
      */
     case Auto;
 }

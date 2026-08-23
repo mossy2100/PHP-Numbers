@@ -220,6 +220,9 @@ public static function copySign(int|float $num, int|float $signSource): int|floa
 Copy the sign of one number to another. Returns a value with the magnitude of the first parameter and the sign of the
 second parameter.
 
+If `$num` is `PHP_INT_MIN` and `$signSource` is positive, the result will be a float, because
+`abs(PHP_INT_MIN)` can't be expressed as an int. In all other cases, the result has the same type as `$num`.
+
 **Parameters:**
 
 - `$num` (int|float) - The number whose magnitude to use.
@@ -254,6 +257,13 @@ With infinity:
 Numbers::copySign(5, INF);     // 5
 Numbers::copySign(5, -INF);    // -5
 Numbers::copySign(INF, -10);   // -INF
+```
+
+With PHP_INT_MIN:
+
+```php
+Numbers::copySign(PHP_INT_MIN, -10);   // PHP_INT_MIN (int, sign already correct)
+Numbers::copySign(PHP_INT_MIN, 10);    // 9.223372036854776E+18 (float, magnitude overflows int)
 ```
 
 Error cases:

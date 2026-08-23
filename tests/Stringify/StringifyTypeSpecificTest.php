@@ -738,23 +738,3 @@ final class StringifyTypeSpecificTest extends TestCase
 
     #endregion
 }
-
-/**
- * Test enum for stringifyEnum tests.
- */
-enum TestEnum
-{
-    case Foo;
-
-    case Bar;
-}
-
-/**
- * Backed test enum for stringifyEnum tests.
- */
-enum TestBackedEnum: string
-{
-    case Alpha = 'a';
-
-    case Beta = 'b';
-}

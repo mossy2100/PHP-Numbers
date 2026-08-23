@@ -12,29 +12,29 @@ use OceanMoon\Core\Integers;
 enum ExponentFormat
 {
     /**
-     * ASCII lower-case E notation (e.g. 'e+23'). The exponent is not padded to a fixed width.
+     * ASCII lower-case E notation (e.g. 'e+42'). The exponent is not padded to a fixed width.
      */
     case AsciiLowerCaseE;
 
     /**
-     * ASCII upper-case E notation (e.g. 'E+23'). The exponent is not padded to a fixed width. Matches the
+     * ASCII upper-case E notation (e.g. 'E+42'). The exponent is not padded to a fixed width. Matches the
      * scientific notation PHP itself falls back to when casting a float to string (e.g. (string) 1.5e20 ===
      * '1.5E+20'), including the explicit sign.
      */
     case AsciiUpperCaseE;
 
     /**
-     * ASCII mathematical notation (e.g. '*10^23'). Uses ASCII operators and digits.
+     * ASCII mathematical notation (e.g. '*10^42'). Uses ASCII operators and digits.
      */
     case AsciiMath;
 
     /**
-     * Unicode mathematical notation (e.g. '×10²³'). Uses the multiplication sign and superscript digits.
+     * Unicode mathematical notation (e.g. '×10⁴²'). Uses the multiplication sign and superscript digits.
      */
     case UnicodeMath;
 
     /**
-     * HTML mathematical notation (e.g. '&times;10<sup>23</sup>').
+     * HTML mathematical notation (e.g. '&times;10<sup>42</sup>').
      */
     case HtmlMath;
 
@@ -48,7 +48,7 @@ enum ExponentFormat
      * by hand (e.g. '×10³', not '×10+3').
      *
      * @param int $exponent The exponent (may be negative, zero, or positive).
-     * @return string The rendered exponent, e.g. 'e+23', 'E-23', '*10^23', '×10²³', '&times;10<sup>23</sup>'.
+     * @return string The rendered exponent, e.g. 'e+42', 'E-42', '*10^42', '×10⁴²', '&times;10<sup>42</sup>'.
      */
     public function format(int $exponent): string
     {

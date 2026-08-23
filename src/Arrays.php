@@ -86,20 +86,23 @@ final class Arrays
     /**
      * Convert an array of strings to a serial list, e.g. 'apples, oranges, and bananas'.
      *
-     * The Oxford comma is always used if there are more than two items.
-     * This could be made an option later, but generally it's a good idea.
-     *
      * The default conjunction is 'and'; a common alternative would be 'or'.
      * Of course, you could use words from other languages, such as 'y' or 'o' (Spanish), or 'et' or 'ou' (French).
      *
+     * Array keys are ignored.
+     *
      * @param array<string> $arr Array of strings.
-     * @param string $conjunction The conjunction to use between the last two items, e.g. 'and'.
+     * @param string $conjunction The conjunction to use between the last two items (default 'and').
+     * @param bool $oxford If an Oxford comma should be used in lists of 3 or more items (default true).
      * @return string Serial list of strings.
      * @throws InvalidArgumentException If any array value is not a string.
      */
-    public static function toSerialList(array $arr, string $conjunction = 'and'): string
+    public static function toSerialList(array $arr, string $conjunction = 'and', bool $oxford = true): string
     {
-        // Ensure all the array values are strings.
+        // Convert to list array.
+        $arr = array_values($arr);
+
+        // Ensure all values are strings.
         foreach ($arr as $value) {
             if (!is_string($value)) {
                 throw new InvalidArgumentException(
@@ -114,8 +117,8 @@ final class Arrays
             0 => '',
             1 => $arr[0],
             2 => $arr[0] . " $conjunction " . $arr[1],
-            default => implode(', ', array_slice($arr, 0, -1)) .
-                ", $conjunction " . $arr[$nItems - 1],
+            default => implode(', ', array_slice($arr, 0, -1)) . ($oxford ? ',' : '') . " $conjunction " .
+                $arr[$nItems - 1],
         };
     }
 

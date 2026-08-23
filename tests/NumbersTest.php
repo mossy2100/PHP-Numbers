@@ -370,6 +370,20 @@ final class NumbersTest extends TestCase
     }
 
     /**
+     * Test copying sign to/from PHP_INT_MIN, whose magnitude can't be expressed as an int.
+     */
+    public function testCopySignWithIntMin(): void
+    {
+        // Negative sign: magnitude and sign are both already correct, so the result stays an int.
+        $this->assertSame(PHP_INT_MIN, Numbers::copySign(PHP_INT_MIN, -10));
+
+        // Positive sign: abs(PHP_INT_MIN) overflows to float, so the result is a float.
+        $result = Numbers::copySign(PHP_INT_MIN, 10);
+        $this->assertIsFloat($result);
+        $this->assertSame(abs((float) PHP_INT_MIN), $result);
+    }
+
+    /**
      * Test that copySign throws DomainException when num is NAN.
      */
     public function testCopySignWithNanAsNum(): void

@@ -39,7 +39,7 @@ Always include an exponent (e.g. `'1.2345×10³'`), rendered per the [`ExponentF
 case Auto;
 ```
 
-Whichever of `FixedPoint` or `Scientific` produces the more compact string. This is `Floats::format()`'s default.
+Whichever of `FixedPoint` or `Scientific` produces the more useful string. This is `Floats::format()`'s default.
 
 `FixedPoint` is preferred unless `Scientific` has fewer significant figures, or `FixedPoint` would need more than 3
 leading or trailing zeros.

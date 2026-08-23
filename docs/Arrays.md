@@ -126,16 +126,18 @@ escaping functions.
 ### toSerialList()
 
 ```php
-public static function toSerialList(array $arr, string $conjunction = 'and'): string
+public static function toSerialList(array $arr, string $conjunction = 'and', bool $oxford = true): string
 ```
 
-Convert an array of strings to a serial list (e.g., `'apples, oranges, and bananas'`). The Oxford comma is always used
-when there are more than two items.
+Convert an array of strings to a serial list (e.g., `'apples, oranges, and bananas'`). By default, the Oxford comma is
+used when there are more than two items. Array keys are ignored - the values are treated as a list, so an associative
+array works just as well as a plain list.
 
 **Parameters:**
 
 - `$arr` (array) - Array of strings.
 - `$conjunction` (string) - The conjunction to use between the last two items (default: `'and'`).
+- `$oxford` (bool) - Whether to use an Oxford comma in lists of 3 or more items (default: `true`).
 
 **Returns:**
 
@@ -152,7 +154,9 @@ Arrays::toSerialList([]);                                    // ''
 Arrays::toSerialList(['apples']);                             // 'apples'
 Arrays::toSerialList(['apples', 'oranges']);                  // 'apples and oranges'
 Arrays::toSerialList(['apples', 'oranges', 'bananas']);       // 'apples, oranges, and bananas'
+Arrays::toSerialList(['apples', 'oranges', 'bananas'], oxford: false); // 'apples, oranges and bananas'
 Arrays::toSerialList(['red', 'green', 'blue'], 'or');         // 'red, green, or blue'
+Arrays::toSerialList(['a' => 'apples', 'b' => 'oranges']);    // 'apples and oranges'
 ```
 
 **Use Case:** Formatting lists in user-facing messages, error messages, or logs.

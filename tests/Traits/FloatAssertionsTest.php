@@ -87,6 +87,22 @@ final class FloatAssertionsTest extends TestCase
     }
 
     /**
+     * Test assertApproxEqual failure message reports the correct relative difference value.
+     *
+     * The relative difference is diff / max(|expected|, |actual|), matching Floats::approxEqual()'s own
+     * algorithm - not diff / expected, which gives a misleading value when the two magnitudes differ a lot.
+     */
+    public function testAssertApproxEqualFailureMessageReportsCorrectRelativeDifference(): void
+    {
+        try {
+            $this->assertApproxEqual(1.0, 1000000.0);
+            $this->fail('Expected AssertionFailedError was not thrown');
+        } catch (AssertionFailedError $e) {
+            $this->assertStringContainsString('Relative difference: 0.999999 ', $e->getMessage());
+        }
+    }
+
+    /**
      * Test assertApproxEqual failure message includes custom message.
      */
     public function testAssertApproxEqualFailureMessageIncludesCustomMessage(): void
