@@ -272,9 +272,14 @@ final class Integers
      */
     public static function isSubscript(string $s): bool
     {
-        $minus = self::SUBSCRIPT_CHARACTERS['-'];
-        $digits = implode('', array_slice(self::SUBSCRIPT_CHARACTERS, 1));
-        return (bool) preg_match("/^$minus?[$digits]+$/u", $s);
+        // Cache the compiled pattern, since SUBSCRIPT_CHARACTERS never changes between calls.
+        static $pattern = null;
+        if ($pattern === null) {
+            $minus = self::SUBSCRIPT_CHARACTERS['-'];
+            $digits = implode('', array_slice(self::SUBSCRIPT_CHARACTERS, 1));
+            $pattern = "/^$minus?[$digits]+$/u";
+        }
+        return (bool) preg_match($pattern, $s);
     }
 
     /**
@@ -285,9 +290,14 @@ final class Integers
      */
     public static function isSuperscript(string $s): bool
     {
-        $minus = self::SUPERSCRIPT_CHARACTERS['-'];
-        $digits = implode('', array_slice(self::SUPERSCRIPT_CHARACTERS, 1));
-        return (bool) preg_match("/^$minus?[$digits]+$/u", $s);
+        // Cache the compiled pattern, since SUPERSCRIPT_CHARACTERS never changes between calls.
+        static $pattern = null;
+        if ($pattern === null) {
+            $minus = self::SUPERSCRIPT_CHARACTERS['-'];
+            $digits = implode('', array_slice(self::SUPERSCRIPT_CHARACTERS, 1));
+            $pattern = "/^$minus?[$digits]+$/u";
+        }
+        return (bool) preg_match($pattern, $s);
     }
 
     /**

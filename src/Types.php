@@ -210,13 +210,13 @@ final class Types
                 break; // @codeCoverageIgnore
             }
 
-            // Add traits from current class.
-            $traits = array_merge($traits, $classTraits);
+            // Add traits from current class. class_uses() keys its result by trait name, so the values must be
+            // unpacked via array_values() first - spreading a string-keyed array would pass named arguments.
+            array_push($traits, ...array_values($classTraits));
 
             // Also get traits used by the traits themselves.
             foreach ($classTraits as $trait) {
-                $traitTraits = self::getTraitsRecursive($trait);
-                $traits = array_merge($traits, $traitTraits);
+                array_push($traits, ...self::getTraitsRecursive($trait));
             }
 
             // Move to parent class.

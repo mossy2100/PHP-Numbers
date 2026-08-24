@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OceanMoon\Core\Tests\Traits;
 
+use InvalidArgumentException;
 use OceanMoon\Core\Tests\Fixtures\ApproxComparableDummy;
 use OceanMoon\Core\Traits\Comparison\ApproxComparable;
 use PHPUnit\Framework\Attributes\CoversTrait;
@@ -60,6 +61,17 @@ final class ApproxComparableTest extends TestCase
 
         $this->assertSame(-1, $a->approxCompare($b, relTol: 0.0001, absTol: 0.0));
         $this->assertSame(0, $a->approxCompare($b, relTol: 0.01, absTol: 0.0));
+    }
+
+    /**
+     * Test approxCompare() propagates the exception approxEqual()/compare() throw for an incompatible type.
+     */
+    public function testApproxCompareThrowsForIncompatibleType(): void
+    {
+        $a = new ApproxComparableDummy(1.0);
+
+        $this->expectException(InvalidArgumentException::class);
+        $a->approxCompare('not a dummy');
     }
 
     #endregion

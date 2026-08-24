@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OceanMoon\Core\Tests\Stringify;
+namespace OceanMoon\Core\Tests\Fixtures;
 
 /**
  * Backed test enum for stringifyEnum tests.

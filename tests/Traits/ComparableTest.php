@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OceanMoon\Core\Tests\Traits;
 
+use InvalidArgumentException;
 use OceanMoon\Core\Tests\Fixtures\ComparableDummy;
 use OceanMoon\Core\Traits\Comparison\Comparable;
 use PHPUnit\Framework\Attributes\CoversTrait;
@@ -37,6 +38,17 @@ final class ComparableTest extends TestCase
 
         $this->assertFalse($a->equal(new ComparableDummy(4)));
         $this->assertFalse($a->equal(new ComparableDummy(6)));
+    }
+
+    /**
+     * Test equal() propagates the exception compare() throws for an incompatible type.
+     */
+    public function testEqualThrowsForIncompatibleType(): void
+    {
+        $a = new ComparableDummy(5);
+
+        $this->expectException(InvalidArgumentException::class);
+        $a->equal('not a dummy');
     }
 
     #endregion

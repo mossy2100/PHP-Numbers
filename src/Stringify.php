@@ -785,7 +785,7 @@ final class Stringify
     {
         // Get keys as strings.
         $keyStrings = [];
-        foreach ($arr as $key => $value) {
+        foreach (array_keys($arr) as $key) {
             $keyStrings[] = self::stringify($key);
         }
 

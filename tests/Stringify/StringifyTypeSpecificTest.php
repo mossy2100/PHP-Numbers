@@ -8,6 +8,8 @@ use Closure;
 use DomainException;
 use InvalidArgumentException;
 use OceanMoon\Core\Stringify;
+use OceanMoon\Core\Tests\Fixtures\TestBackedEnum;
+use OceanMoon\Core\Tests\Fixtures\TestEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -415,7 +417,7 @@ final class StringifyTypeSpecificTest extends TestCase
     {
         // Test that stringify() dispatches enums correctly.
         $result = Stringify::stringify(TestEnum::Foo);
-        $this->assertSame('OceanMoon\Core\Tests\Stringify\TestEnum::Foo', $result);
+        $this->assertSame('OceanMoon\Core\Tests\Fixtures\TestEnum::Foo', $result);
     }
 
     /**
@@ -423,8 +425,8 @@ final class StringifyTypeSpecificTest extends TestCase
      */
     public function testStringifyEnumDirect(): void
     {
-        $this->assertSame('OceanMoon\Core\Tests\Stringify\TestEnum::Foo', Stringify::stringifyEnum(TestEnum::Foo));
-        $this->assertSame('OceanMoon\Core\Tests\Stringify\TestEnum::Bar', Stringify::stringifyEnum(TestEnum::Bar));
+        $this->assertSame('OceanMoon\Core\Tests\Fixtures\TestEnum::Foo', Stringify::stringifyEnum(TestEnum::Foo));
+        $this->assertSame('OceanMoon\Core\Tests\Fixtures\TestEnum::Bar', Stringify::stringifyEnum(TestEnum::Bar));
     }
 
     /**
@@ -433,7 +435,7 @@ final class StringifyTypeSpecificTest extends TestCase
     public function testStringifyBackedEnum(): void
     {
         $this->assertSame(
-            'OceanMoon\Core\Tests\Stringify\TestBackedEnum::Alpha',
+            'OceanMoon\Core\Tests\Fixtures\TestBackedEnum::Alpha',
             Stringify::stringifyEnum(TestBackedEnum::Alpha)
         );
     }

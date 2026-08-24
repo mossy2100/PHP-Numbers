@@ -450,38 +450,45 @@ final class ConsoleTest extends TestCase
     #region Badge method tests.
 
     /**
-     * Test success() prints white-on-green text with a checkmark glyph.
+     * Test success() prints bold white-on-green text with a checkmark glyph, padded with exactly one leading and
+     * one trailing space.
      */
     public function testSuccess(): void
     {
-        $this->expectOutputRegex('/\033\[97m\033\[42m ✓ ok /');
+        $this->expectOutputRegex('/^\033\[1m\033\[97m\033\[42m ✓ ok \033\[49m/');
         $this->console->success('ok');
     }
 
     /**
-     * Test error() prints white-on-red text with a cross glyph.
+     * Test error() prints bold white-on-red text with a cross glyph, padded with exactly one leading and one
+     * trailing space.
+     *
+     * Regression test: error() previously built its padded text differently from success()/warn()/info(),
+     * resulting in a doubled trailing space that this anchored regex would catch.
      */
     public function testError(): void
     {
-        $this->expectOutputRegex('/\033\[97m\033\[41m ✗ bad /');
+        $this->expectOutputRegex('/^\033\[1m\033\[97m\033\[41m ✗ bad \033\[49m/');
         $this->console->error('bad');
     }
 
     /**
-     * Test warn() prints black-on-bright-yellow text with a warning glyph.
+     * Test warn() prints bold black-on-bright-yellow text with a warning glyph, padded with exactly one leading
+     * and one trailing space.
      */
     public function testWarn(): void
     {
-        $this->expectOutputRegex('/\033\[30m\033\[103m ⚠ careful /');
+        $this->expectOutputRegex('/^\033\[1m\033\[30m\033\[103m ⚠ careful \033\[49m/');
         $this->console->warn('careful');
     }
 
     /**
-     * Test info() prints white-on-blue text with an info glyph.
+     * Test info() prints bold white-on-blue text with an info glyph, padded with exactly one leading and one
+     * trailing space.
      */
     public function testInfo(): void
     {
-        $this->expectOutputRegex('/\033\[97m\033\[44m ℹ fyi /');
+        $this->expectOutputRegex('/^\033\[1m\033\[97m\033\[44m ℹ fyi \033\[49m/');
         $this->console->info('fyi');
     }
 

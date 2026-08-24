@@ -452,6 +452,121 @@ final class ArraysTest extends TestCase
 
     #endregion
 
+    #region Method toSerialList() tests.
+
+    /**
+     * Test toSerialList with empty array returns empty string.
+     */
+    public function testToSerialListEmpty(): void
+    {
+        $this->assertSame('', Arrays::toSerialList([]));
+    }
+
+    /**
+     * Test toSerialList with one item returns just that item.
+     */
+    public function testToSerialListOneItem(): void
+    {
+        $this->assertSame('apples', Arrays::toSerialList(['apples']));
+    }
+
+    /**
+     * Test toSerialList with two items uses conjunction without Oxford comma.
+     */
+    public function testToSerialListTwoItems(): void
+    {
+        $this->assertSame('apples and oranges', Arrays::toSerialList(['apples', 'oranges']));
+    }
+
+    /**
+     * Test toSerialList with three items uses Oxford comma.
+     */
+    public function testToSerialListThreeItems(): void
+    {
+        $this->assertSame('apples, oranges, and bananas', Arrays::toSerialList(['apples', 'oranges', 'bananas']));
+    }
+
+    /**
+     * Test toSerialList with four items.
+     */
+    public function testToSerialListFourItems(): void
+    {
+        $this->assertSame(
+            'apples, oranges, bananas, and grapes',
+            Arrays::toSerialList(['apples', 'oranges', 'bananas', 'grapes'])
+        );
+    }
+
+    /**
+     * Test toSerialList with custom conjunction.
+     */
+    public function testToSerialListCustomConjunction(): void
+    {
+        $this->assertSame('apples or oranges', Arrays::toSerialList(['apples', 'oranges'], 'or'));
+        $this->assertSame(
+            'apples, oranges, or bananas',
+            Arrays::toSerialList(['apples', 'oranges', 'bananas'], 'or')
+        );
+    }
+
+    /**
+     * Test toSerialList throws InvalidArgumentException for non-string values.
+     */
+    public function testToSerialListThrowsExceptionForNonStrings(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid array value type: int. Must be string.');
+
+        Arrays::toSerialList(['foo', 42, 'bar']); // @phpstan-ignore argument.type
+    }
+
+    /**
+     * Test toSerialList with oxford set to false omits the Oxford comma.
+     */
+    public function testToSerialListWithoutOxfordComma(): void
+    {
+        $this->assertSame(
+            'apples, oranges and bananas',
+            Arrays::toSerialList(['apples', 'oranges', 'bananas'], oxford: false)
+        );
+        $this->assertSame(
+            'apples, oranges, bananas and grapes',
+            Arrays::toSerialList(['apples', 'oranges', 'bananas', 'grapes'], oxford: false)
+        );
+
+        // Oxford comma has no effect with fewer than three items.
+        $this->assertSame('apples and oranges', Arrays::toSerialList(['apples', 'oranges'], oxford: false));
+    }
+
+    /**
+     * Test toSerialList with an associative array normalizes to a list before formatting.
+     */
+    public function testToSerialListAssociativeArray(): void
+    {
+        $this->assertSame('apples', Arrays::toSerialList([
+            'a' => 'apples',
+        ]));
+
+        $this->assertSame(
+            'apples and oranges',
+            Arrays::toSerialList([
+                'a' => 'apples',
+                'b' => 'oranges',
+            ])
+        );
+
+        $this->assertSame(
+            'apples, oranges, and bananas',
+            Arrays::toSerialList([
+                'a' => 'apples',
+                'b' => 'oranges',
+                'c' => 'bananas',
+            ])
+        );
+    }
+
+    #endregion
+
     #region Method first() tests.
 
     /**
@@ -581,121 +696,6 @@ final class ArraysTest extends TestCase
             'only' => 'value',
         ];
         $this->assertEquals(Arrays::first($arr), Arrays::last($arr));
-    }
-
-    #endregion
-
-    #region Method toSerialList() tests.
-
-    /**
-     * Test toSerialList with empty array returns empty string.
-     */
-    public function testToSerialListEmpty(): void
-    {
-        $this->assertSame('', Arrays::toSerialList([]));
-    }
-
-    /**
-     * Test toSerialList with one item returns just that item.
-     */
-    public function testToSerialListOneItem(): void
-    {
-        $this->assertSame('apples', Arrays::toSerialList(['apples']));
-    }
-
-    /**
-     * Test toSerialList with two items uses conjunction without Oxford comma.
-     */
-    public function testToSerialListTwoItems(): void
-    {
-        $this->assertSame('apples and oranges', Arrays::toSerialList(['apples', 'oranges']));
-    }
-
-    /**
-     * Test toSerialList with three items uses Oxford comma.
-     */
-    public function testToSerialListThreeItems(): void
-    {
-        $this->assertSame('apples, oranges, and bananas', Arrays::toSerialList(['apples', 'oranges', 'bananas']));
-    }
-
-    /**
-     * Test toSerialList with four items.
-     */
-    public function testToSerialListFourItems(): void
-    {
-        $this->assertSame(
-            'apples, oranges, bananas, and grapes',
-            Arrays::toSerialList(['apples', 'oranges', 'bananas', 'grapes'])
-        );
-    }
-
-    /**
-     * Test toSerialList with custom conjunction.
-     */
-    public function testToSerialListCustomConjunction(): void
-    {
-        $this->assertSame('apples or oranges', Arrays::toSerialList(['apples', 'oranges'], 'or'));
-        $this->assertSame(
-            'apples, oranges, or bananas',
-            Arrays::toSerialList(['apples', 'oranges', 'bananas'], 'or')
-        );
-    }
-
-    /**
-     * Test toSerialList throws InvalidArgumentException for non-string values.
-     */
-    public function testToSerialListThrowsExceptionForNonStrings(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid array value type: int. Must be string.');
-
-        Arrays::toSerialList(['foo', 42, 'bar']); // @phpstan-ignore argument.type
-    }
-
-    /**
-     * Test toSerialList with oxford set to false omits the Oxford comma.
-     */
-    public function testToSerialListWithoutOxfordComma(): void
-    {
-        $this->assertSame(
-            'apples, oranges and bananas',
-            Arrays::toSerialList(['apples', 'oranges', 'bananas'], oxford: false)
-        );
-        $this->assertSame(
-            'apples, oranges, bananas and grapes',
-            Arrays::toSerialList(['apples', 'oranges', 'bananas', 'grapes'], oxford: false)
-        );
-
-        // Oxford comma has no effect with fewer than three items.
-        $this->assertSame('apples and oranges', Arrays::toSerialList(['apples', 'oranges'], oxford: false));
-    }
-
-    /**
-     * Test toSerialList with an associative array normalizes to a list before formatting.
-     */
-    public function testToSerialListAssociativeArray(): void
-    {
-        $this->assertSame('apples', Arrays::toSerialList([
-            'a' => 'apples',
-        ]));
-
-        $this->assertSame(
-            'apples and oranges',
-            Arrays::toSerialList([
-                'a' => 'apples',
-                'b' => 'oranges',
-            ])
-        );
-
-        $this->assertSame(
-            'apples, oranges, and bananas',
-            Arrays::toSerialList([
-                'a' => 'apples',
-                'b' => 'oranges',
-                'c' => 'bananas',
-            ])
-        );
     }
 
     #endregion
