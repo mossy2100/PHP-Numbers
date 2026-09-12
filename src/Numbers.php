@@ -39,6 +39,21 @@ final class Numbers
         return is_int($value) || is_float($value);
     }
 
+    /**
+     * Check if a value is a finite number, i.e. an integer or a finite float.
+     *
+     * This is like isNumber(), except that it also rejects the non-finite float values INF, -INF, and NAN.
+     * Integers are always finite, so only floats are passed to is_finite().
+     *
+     * @param mixed $value The value to check.
+     * @return bool True if the value is a finite number, false otherwise.
+     * @phpstan-assert-if-true int|float $value
+     */
+    public static function isFiniteNumber(mixed $value): bool
+    {
+        return is_int($value) || (is_float($value) && is_finite($value));
+    }
+
     #endregion
 
     #region Comparison methods

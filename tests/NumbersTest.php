@@ -84,6 +84,81 @@ final class NumbersTest extends TestCase
 
     #endregion
 
+    #region Method isFiniteNumber() tests.
+
+    /**
+     * Test Numbers::isFiniteNumber returns true for integers.
+     */
+    public function testIsFiniteNumberWithIntegers(): void
+    {
+        $this->assertTrue(Numbers::isFiniteNumber(0)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(42)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(-99)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(PHP_INT_MAX)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(PHP_INT_MIN)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+    }
+
+    /**
+     * Test Numbers::isFiniteNumber returns true for finite floats.
+     */
+    public function testIsFiniteNumberWithFiniteFloats(): void
+    {
+        $this->assertTrue(Numbers::isFiniteNumber(0.0)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(3.14)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(-2.5)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(1e10)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(PHP_FLOAT_MAX)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(Numbers::isFiniteNumber(PHP_FLOAT_MIN)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $this->assertTrue(
+            Numbers::isFiniteNumber(PHP_FLOAT_EPSILON) // @phpstan-ignore staticMethod.alreadyNarrowedType
+        );
+        $this->assertTrue(Numbers::isFiniteNumber(-0.0)); // @phpstan-ignore staticMethod.alreadyNarrowedType
+    }
+
+    /**
+     * Test Numbers::isFiniteNumber returns false for non-finite floats.
+     */
+    public function testIsFiniteNumberWithNonFiniteFloats(): void
+    {
+        // @phpstan-ignore method.impossibleType, staticMethod.alreadyNarrowedType
+        $this->assertFalse(Numbers::isFiniteNumber(INF));
+
+        // @phpstan-ignore method.impossibleType, staticMethod.alreadyNarrowedType
+        $this->assertFalse(Numbers::isFiniteNumber(-INF));
+
+        // @phpstan-ignore method.impossibleType, staticMethod.alreadyNarrowedType
+        $this->assertFalse(Numbers::isFiniteNumber(NAN));
+    }
+
+    /**
+     * Test Numbers::isFiniteNumber returns false for numeric strings.
+     */
+    public function testIsFiniteNumberWithNumericStrings(): void
+    {
+        $this->assertFalse(Numbers::isFiniteNumber('42')); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber('3.14')); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber('-99')); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber('1e10')); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber('0x1A')); // @phpstan-ignore staticMethod.impossibleType
+    }
+
+    /**
+     * Test Numbers::isFiniteNumber returns false for non-numeric types.
+     */
+    public function testIsFiniteNumberWithNonNumericTypes(): void
+    {
+        $this->assertFalse(Numbers::isFiniteNumber('hello')); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber('')); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber(true)); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber(false)); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber(null)); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber([])); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber([1, 2])); // @phpstan-ignore staticMethod.impossibleType
+        $this->assertFalse(Numbers::isFiniteNumber(new stdClass())); // @phpstan-ignore staticMethod.impossibleType
+    }
+
+    #endregion
+
     #region Method equal() tests.
 
     /**

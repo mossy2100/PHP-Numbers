@@ -54,6 +54,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   PHP's current default (`Locale::getDefault()`, which always returns a value). Also adds
   **`Environment::INVARIANT_LOCALE`** (`'en_US_POSIX'`), used internally by `Floats::format()` for deterministic,
   locale-independent output.
+- **`Numbers::isFiniteNumber()`** — like `isNumber()`, but additionally rejects the non-finite float values `INF`,
+  `-INF`, and `NAN` via `is_finite()`. Integers are always finite, so only floats are passed to `is_finite()`.
 
 ### Changed
 
@@ -232,6 +234,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   claims about `stringifyEnum()`/`stringifyObject()` behavior, and three missing `@throws`; `Types.md` missing the
   `closure` case in `getBasicType()`'s docs (see `Types::getBasicType()`, Added, above). `docs/Numbers.md` was
   audited too and found already accurate.
+- **`docs/Numbers.md`**: added an `isFiniteNumber()` section to Inspection Methods (including a comparison table
+  against `isNumber()` highlighting the `INF`/`-INF`/`NAN` difference) and a matching Key Features bullet.
 
 ### Tests
 
@@ -245,6 +249,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   from the trait.
 - **`tests/TypesTest.php`**: added `testGetStringKeyClosure()` for `getUniqueString()`'s new `closure` case
   (identity-based key, no collision with `object` keys), and added a closure to `testGetStringKeyUniqueness()`.
+- **`tests/NumbersTest.php`**: added a `Method isFiniteNumber() tests.` region with 5 tests covering integers, finite
+  floats (including `-0.0` and the `PHP_FLOAT_*` boundaries), the non-finite floats `INF`/`-INF`/`NAN`, numeric
+  strings, and non-numeric types.
 
 ## [3.0.0] - 2026-07-17
 

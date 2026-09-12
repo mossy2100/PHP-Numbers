@@ -12,6 +12,7 @@ equality comparison, and sign operations. This is a static utility class and can
 ### Key Features
 
 - Type checking that distinguishes actual numbers from numeric strings.
+- Finite-number checking that excludes the non-finite float values `INF`, `-INF`, and `NAN`.
 - Equality comparison that correctly handles mixed int/float types.
 - Sign operations with support for IEEE-754 signed zeros (-0.0 vs +0.0).
 
@@ -58,6 +59,55 @@ Numbers::isNumber(null);      // false
 | `'0x1A'` | `false`      | `true`         |
 | `true`   | `false`      | `false`        |
 | `null`   | `false`      | `false`        |
+
+### isFiniteNumber()
+
+```php
+public static function isFiniteNumber(mixed $value): bool
+```
+
+Check if a value is a finite number (an `int` or a finite `float`). This is like `isNumber()`, except that the
+non-finite float values `INF`, `-INF`, and `NAN` return `false`. Integers are always finite, so only floats are passed
+to PHP's `is_finite()`.
+
+Like `isNumber()`, this differs from PHP's built-in `is_numeric()`, which also returns `true` for numeric strings like
+`"42"` or `"3.14"`.
+
+**Parameters:**
+
+- `$value` (mixed) - The value to check.
+
+**Returns:** `bool` - `true` if the value is an `int` or a finite `float`, `false` otherwise.
+
+**Examples:**
+
+```php
+Numbers::isFiniteNumber(42);          // true
+Numbers::isFiniteNumber(3.14);        // true
+Numbers::isFiniteNumber(-0.0);        // true
+Numbers::isFiniteNumber(PHP_INT_MAX); // true
+Numbers::isFiniteNumber(INF);         // false (positive infinity)
+Numbers::isFiniteNumber(-INF);        // false (negative infinity)
+Numbers::isFiniteNumber(NAN);         // false (not a number)
+Numbers::isFiniteNumber('42');        // false (numeric string)
+Numbers::isFiniteNumber('hello');     // false
+Numbers::isFiniteNumber(true);        // false
+Numbers::isFiniteNumber(null);        // false
+```
+
+**Comparison with `isNumber()`:**
+
+| Value  | `isFiniteNumber()` | `isNumber()` |
+| ------ | ------------------ | ------------ |
+| `42`   | `true`             | `true`       |
+| `3.14` | `true`             | `true`       |
+| `-0.0` | `true`             | `true`       |
+| `INF`  | `false`            | `true`       |
+| `-INF` | `false`            | `true`       |
+| `NAN`  | `false`            | `true`       |
+| `'42'` | `false`            | `false`      |
+| `true` | `false`            | `false`      |
+| `null` | `false`            | `false`      |
 
 ---
 
