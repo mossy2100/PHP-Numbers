@@ -157,7 +157,8 @@ final class Stringify
      * @param int $indentLevel The level of indentation for this structure (default 0).
      * @return string The string representation of the value.
      * @throws DomainException If the value cannot be stringified.
-     * @throws UnexpectedValueException If the value has an unknown type.
+     * @throws UnexpectedValueException If the value has an unknown type. Defensive only: every type
+     * Types::getBasicType() can currently return is handled above, so this isn't reachable in practice.
      */
     public static function stringify(mixed $value, bool $prettyPrint = false, int $indentLevel = 0): string
     {
@@ -243,7 +244,8 @@ final class Stringify
      * @param int $maxLen The maximum length of the result. The minimum value is 3.
      * @return string The short string representation.
      * @throws DomainException If the maximum length is less than the minimum, or if the value cannot be stringified.
-     * @throws UnexpectedValueException If the type cannot be inferred.
+     * @throws UnexpectedValueException If the type cannot be inferred. Defensive only — see stringify(), which this
+     * method calls internally; not reachable in practice.
      */
     public static function abbrev(mixed $value, int $maxLen = 32): string
     {

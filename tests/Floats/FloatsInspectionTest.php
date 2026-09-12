@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OceanMoon\Core\Tests\Floats;
 
+use DomainException;
 use OceanMoon\Core\Floats;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -233,6 +234,36 @@ final class FloatsInspectionTest extends TestCase
     public function testGetExponentWithLog10OverestimateJustBelowPowerOfTen(): void
     {
         $this->assertSame(14, Floats::getExponent(999999999999999.9));
+    }
+
+    /**
+     * Test getExponent() throws for NAN.
+     */
+    public function testGetExponentWithNanThrows(): void
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Invalid value: NAN. Must be finite.');
+        Floats::getExponent(NAN);
+    }
+
+    /**
+     * Test getExponent() throws for +INF and -INF.
+     */
+    public function testGetExponentWithInfThrows(): void
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Invalid value: INF. Must be finite.');
+        Floats::getExponent(INF);
+    }
+
+    /**
+     * Test getExponent() throws for -INF.
+     */
+    public function testGetExponentWithNegativeInfThrows(): void
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Invalid value: -INF. Must be finite.');
+        Floats::getExponent(-INF);
     }
 
     #endregion

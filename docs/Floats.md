@@ -243,6 +243,8 @@ would otherwise throw off the result by one).
 
 **Returns:** `int` - The exponent. Returns `0` for a value of `0.0`.
 
+**Throws:** `DomainException` - If `$value` is non-finite.
+
 **Examples:**
 
 ```php
@@ -648,6 +650,8 @@ the value modulo the period and adjusts it to fit within the specified range.
 
 **Returns:** `float` - The wrapped value within the specified range
 
+**Throws:** `DomainException` - If `$unitsPerTurn` is not finite and positive.
+
 **Behavior:**
 
 The range depends on the `$signed` parameter:
@@ -803,7 +807,7 @@ Format a float as a string with control over precision, notation, exponent style
 NAN and ±INF are returned as their default PHP string representations (`'NAN'`, `'INF'`, `'-INF'`), regardless of the
 other parameters.
 
-`FloatFormat::Auto` will determine which of `FixedPoint` and `Scientific` produces the more readable and useful output. `FixedPoint` will be used unless the result has fewer significant figures, or more than 3 leading or trailing zeros.
+`FloatFormat::Auto` will determine which of `FixedPoint` and `Scientific` produces the more readable and useful output. See [FloatFormat::Auto](Enums/FloatFormat.md#auto) for more detail.
 
 **Parameters:**
 
@@ -814,22 +818,21 @@ other parameters.
   If `false`, all digits from `$precision` are preserved.
 - `$format` (`FloatFormat`) - Selects the notation. Default `FloatFormat::Auto`.
 
-  | Case                      | Description                                                          |
-  | ------------------------- | -------------------------------------------------------------------- |
-  | `FloatFormat::FixedPoint` | Does not include an exponent.                                        |
-  | `FloatFormat::Scientific` | Always includes an exponent.                                         |
-  | `FloatFormat::Auto`       | Whichever of the above produces the more useful string. **Default.** |
+| Case                      | Description                                                          |
+| ------------------------- | -------------------------------------------------------------------- |
+| `FloatFormat::FixedPoint` | Does not include an exponential part.                                |
+| `FloatFormat::Scientific` | Always includes an exponential part.                                 |
+| `FloatFormat::Auto`       | Whichever of the above produces the more useful string. **Default.** |
 
-- `$expFormat` (`ExponentFormat`) - Controls how an exponent, if present, is rendered. Default
-  `ExponentFormat::UnicodeMath`.
+- `$expFormat` (`ExponentFormat`) - Controls how the exponential part is rendered when `FloatFormat` is `Scientific`. Default `ExponentFormat::UnicodeMath`.
 
-  | Case                              | Example (exponent 42)    |
-  | --------------------------------- | ------------------------ |
-  | `ExponentFormat::AsciiLowerCaseE` | `e+42`                   |
-  | `ExponentFormat::AsciiUpperCaseE` | `E+42`                   |
-  | `ExponentFormat::AsciiMath`       | `*10^42`                 |
-  | `ExponentFormat::UnicodeMath`     | `×10⁴²` **Default.**     |
-  | `ExponentFormat::HtmlMath`        | `&times;10<sup>42</sup>` |
+| Case                              | Example                  |
+| --------------------------------- | ------------------------ |
+| `ExponentFormat::AsciiLowerCaseE` | `e+42`                   |
+| `ExponentFormat::AsciiUpperCaseE` | `E+42`                   |
+| `ExponentFormat::AsciiMath`       | `*10^42`                 |
+| `ExponentFormat::UnicodeMath`     | `×10⁴²` **Default.**     |
+| `ExponentFormat::HtmlMath`        | `&times;10<sup>42</sup>` |
 
 - `$roundingMode` (`RoundingMode`) - The rounding mode to use. Default `RoundingMode::HalfAwayFromZero`, matching
   `round()`, `Rational::round()`, and `Complex::round()`, rather than `sprintf()`'s round-half-to-even behavior.

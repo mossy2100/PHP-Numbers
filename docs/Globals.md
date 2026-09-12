@@ -42,7 +42,7 @@ naming pattern for mathematical constants, such as `M_PI`, `M_E`, etc.
 use const OceanMoon\Core\M_TAU;
 
 $radius = 10;
-$area = M_TAU * $radius;  // ≈ 62.83185307179586
+$circumference = M_TAU * $radius;  // ≈ 62.83185307179586
 ```
 
 ### RECURSION

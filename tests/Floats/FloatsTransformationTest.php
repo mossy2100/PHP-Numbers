@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OceanMoon\Core\Tests\Floats;
 
+use DomainException;
 use OceanMoon\Core\Floats;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -324,6 +325,46 @@ final class FloatsTransformationTest extends TestCase
         $this->assertSame(18.0, Floats::wrap(18.0, 24.0, signed: false));
         $this->assertSame(1.0, Floats::wrap(25.0, 24.0, signed: false));
         $this->assertSame(21.0, Floats::wrap(-3.0, 24.0, signed: false));
+    }
+
+    /**
+     * Test wrap() with a zero units per turn throws DomainException.
+     */
+    public function testWrapWithZeroUnitsPerTurnThrows(): void
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Invalid units per turn: 0.0. Must be finite and positive.');
+        Floats::wrap(5.0, 0.0);
+    }
+
+    /**
+     * Test wrap() with a negative units per turn throws DomainException.
+     */
+    public function testWrapWithNegativeUnitsPerTurnThrows(): void
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Invalid units per turn: -10.0. Must be finite and positive.');
+        Floats::wrap(5.0, -10.0);
+    }
+
+    /**
+     * Test wrap() with a NAN units per turn throws DomainException.
+     */
+    public function testWrapWithNanUnitsPerTurnThrows(): void
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Invalid units per turn: NAN. Must be finite and positive.');
+        Floats::wrap(5.0, NAN);
+    }
+
+    /**
+     * Test wrap() with an infinite units per turn throws DomainException.
+     */
+    public function testWrapWithInfiniteUnitsPerTurnThrows(): void
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Invalid units per turn: INF. Must be finite and positive.');
+        Floats::wrap(5.0, INF);
     }
 
     #endregion

@@ -142,9 +142,14 @@ final class Floats
      *
      * @param float $value The value to get the exponent of. Must be finite.
      * @return int The exponent. Returns 0 for a value of 0.0.
+     * @throws DomainException If value is non-finite.
      */
     public static function getExponent(float $value): int
     {
+        if (!is_finite($value)) {
+            throw new DomainException(Stringify::prepEx('Invalid value: ?. Must be finite.', $value));
+        }
+
         // Handle 0 separately to avoid INF result.
         if ($value === 0.0) {
             return 0;
@@ -345,9 +350,17 @@ final class Floats
      * @param float $unitsPerTurn The number of units per full rotation (default TAU).
      * @param bool $signed If true (default), wrap to the signed range; otherwise wrap to the unsigned range.
      * @return float The wrapped value.
+     * @throws DomainException If $unitsPerTurn is not finite and positive.
      */
     public static function wrap(float $value, float $unitsPerTurn = M_TAU, bool $signed = true): float
     {
+        // Validate the units per turn.
+        if (!is_finite($unitsPerTurn) || $unitsPerTurn <= 0.0) {
+            throw new DomainException(
+                Stringify::prepEx('Invalid units per turn: ?. Must be finite and positive.', $unitsPerTurn)
+            );
+        }
+
         // Reduce using fmod to avoid large magnitudes.
         // $r will be in the range [0, $unitsPerTurn) if $value is positive, or (-$unitsPerTurn, 0] if negative.
         $r = fmod($value, $unitsPerTurn);
@@ -405,40 +418,40 @@ final class Floats
      * NAN and ±INF are returned as their default PHP string representations ('NAN', 'INF', '-INF'), regardless of
      * the other parameters.
      *
-     * The meaning of $precision depends on $format:
+     * The meaning of $precision depends on $format.
      *   - FixedPoint: Number of decimal places.
      *   - Scientific: Number of significant digits.
-     *   - Auto: Depends which format is used. If fixed-point is selected, decimal places; if not, significant figures.
+     *   - Auto:       Depends which format is selected (see below).
      *
-     * The $format parameter selects the notation:
-     *   - FloatFormat::FixedPoint: Does not include exponent.
-     *   - FloatFormat::Scientific: Always includes exponent.
-     *   - FloatFormat::Auto (default): Whichever of the above produces the more useful string, with the greater
-     *     number of significant figures and not too many leading or trailing zeros.
+     * $format determines the presence of an exponential part:
+     *   - FloatFormat::FixedPoint: Does not include an exponential part.
+     *   - FloatFormat::Scientific: Always includes an exponential part.
+     *   - FloatFormat::Auto: Whichever of the above produces the more useful string (default).
+     * @see OceanMoon\Core\Enums\FloatFormat
      *
      * If $trimZeros is:
-     * - true:  Trailing zeros - and, if necessary, a trailing decimal point - are automatically removed.
-     *          For scientific notation this applies to the mantissa.
-     * - false: All digits are preserved (default).
+     *   - true:  Trailing zeros - and, if necessary, a trailing decimal point - are automatically removed.
+     *            For scientific notation this applies to the mantissa.
+     *   - false: All digits are preserved (default).
      *
      * $expFormat controls how an exponent, if present, is rendered.
-     * @see ExponentFormat for options.
+     * @see OceanMoon\Core\Enums\ExponentFormat
      *
      * For example:
      * ```php
      * Floats::format(1234.5);                                      // '1234.5'
-     * Floats::format(0.0001234, format: FloatFormat::Scientific);  // '1.234E-4'
+     * Floats::format(0.0001234, format: FloatFormat::Scientific);  // '1.234×10⁻⁴'
      * Floats::format(1234.5, precision: 3, trimZeros: false);      // '1234.500'
      * ```
      *
      * @param float $value The numeric value to format.
-     * @param int $precision Maximum number of decimal places or significant digits to include (default 6).
+     * @param int $precision The maximum number of decimal places or significant digits to include (default 6).
      * @param bool $trimZeros If trailing zeros should be trimmed (default true).
      * @param FloatFormat $format If the value should be formatted using FixedPoint or Scientific notation, or Auto
-     * to choose the best one (default).
-     * @param ExponentFormat $expFormat The exponent format to use (default UnicodeMath).
+     *     to choose the best one (default).
+     * @param ExponentFormat $expFormat The exponent format to use. (default UnicodeMath)
      * @param RoundingMode $roundingMode The rounding mode to use. (default HalfAwayFromZero, matching round(),
-     * Rational::round(), and Complex::round(), rather than sprintf()'s round-half-to-even behavior).
+     *     Rational::round(), and Complex::round(), rather than sprintf()'s round-half-to-even behavior).
      * @return string The formatted value string.
      * @throws DomainException If the precision is outside the valid range.
      */
@@ -1060,7 +1073,7 @@ final class Floats
     }
 
     /**
-     * Format a float in scientific notation (always includes an exponent), using the invariant locale.
+     * Format a float in scientific notation (always includes an exponential part), using the invariant locale.
      *
      * @param float $value The value to format.
      * @param int $precision The number of significant digits.
@@ -1136,7 +1149,7 @@ final class Floats
             $nTrailing0s++;
         }
 
-        // Get the number of signficant digits.
+        // Get the number of significant digits.
         $nSigDigits = $length - $nLeading0s - $nTrailing0s;
 
         return [$nLeading0s, $nSigDigits, $nTrailing0s];

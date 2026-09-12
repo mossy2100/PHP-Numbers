@@ -37,17 +37,17 @@ Comparable   ApproxEquatable
 Every method in every trait here is typed `mixed $other`, never `self`. Two reasons:
 
 1. `self` is invariant across trait composition and inheritance: if a class using one of these traits is subclassed and
-   the subclass overrides a method like `equal()` or `compare()`, `self` in that override would narrow to the subclass -
-   which PHP rejects as an incompatible override of the trait method (bound to the base class).
+   the subclass overrides a method like `equal()` or `compare()`, `self` in that override would narrow to the subclass.
+   PHP rejects this as an incompatible override of the trait method (bound to the base class).
 2. A handful of types legitimately compare against a related-but-different type (e.g. `Complex` accepting `int` or
    `float`). There's no type hint for "self or number", so implementations check the type of `$other` themselves.
 
 Because the type hint can't do the work, implementations are expected to check `$other`'s type explicitly (typically
 `instanceof self`) and **throw** (typically `InvalidArgumentException`) for anything that isn't a deliberate, documented
-exception - never silently attempt a conversion. This mirrors why `==`/`!=` are avoided in favor of `===`/`!==` in
+exception. Never silently attempt a conversion. This mirrors why `==`/`!=` are avoided in favor of `===`/`!==` in
 modern PHP: implicit type juggling in comparisons is a recurring source of bugs. Widening a comparison method to accept
 a related type should be rare, mathematically justified on a case-by-case basis, and documented at the point of
-implementation - not a general-purpose "convert whatever you're given" policy.
+implementation, not as a general-purpose "convert whatever you're given" policy.
 
 ---
 
@@ -81,7 +81,7 @@ trait Comparable
 **You get:** `equal()` (based on `compare()`), `lessThan()`, `greaterThan()`, `lessThanOrEqual()`,
 `greaterThanOrEqual()`
 
-**Note:** You don't implement `equal()` - the trait provides it based on `compare()`
+**Note:** You don't need to implement `equal()`, as the trait provides it.
 
 ### ApproxEquatable (Uses Equatable)
 
@@ -116,7 +116,7 @@ trait ApproxComparable
 
 **You get:** All methods from both `Comparable` and `ApproxEquatable`, plus `approxCompare()`
 
-**Note:** You don't implement `equal()` - `Comparable` provides it via `compare()`
+**Note:** You don't implement `equal()`, as `Comparable` provides it.
 
 ---
 
@@ -251,7 +251,7 @@ class Rational
 ## Method Override Rules
 
 You can override any provided method if needed, but this is rarely necessary. Don't override provided methods
-(`equal()`, `lessThan()`, `approxCompare()`, etc.) unless you have a specific reason - the default implementations are
+(`equal()`, `lessThan()`, `approxCompare()`, etc.) unless you have a specific reason. The default implementations are
 well-tested and consistent.
 
 ---

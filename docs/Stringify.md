@@ -137,7 +137,8 @@ appropriate type-specific method.
 
 - `DomainException` - If the value cannot be stringified (e.g., a string whose encoding can't be detected or
   converted to UTF-8).
-- `UnexpectedValueException` - If the value has an unknown type (probably never happen).
+- `UnexpectedValueException` - If the value has an unknown type. Defensive only: every type `Types::getBasicType()`
+  can currently return is handled, so this isn't reachable in practice.
 
 **Examples:**
 
@@ -229,7 +230,8 @@ error messages and logs where space is limited.
 **Throws:**
 
 - `DomainException` - If the maximum length is less than 3, or if the value cannot be stringified.
-- `UnexpectedValueException` - If the value's type cannot be inferred.
+- `UnexpectedValueException` - If the value's type cannot be inferred. Defensive only — see `stringify()`, which
+  this method calls internally; not reachable in practice.
 
 **Examples:**
 

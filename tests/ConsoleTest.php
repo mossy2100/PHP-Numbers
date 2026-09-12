@@ -846,6 +846,7 @@ final class ConsoleTest extends TestCase
     public function testHrWithEmptyStringThrows(): void
     {
         $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Horizontal rule character must not be empty.');
         $this->console->hr('', 5);
     }
 

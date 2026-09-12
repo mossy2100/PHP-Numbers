@@ -7,19 +7,19 @@ namespace OceanMoon\Core\Enums;
 use OceanMoon\Core\Integers;
 
 /**
- * Rendering styles for the exponent portion of scientific-notation float output.
+ * Rendering styles for the exponential part of scientific-notation float output.
  */
 enum ExponentFormat
 {
     /**
-     * ASCII lower-case E notation (e.g. 'e+42'). The exponent is not padded to a fixed width.
+     * ASCII lower-case E notation with explicit sign (e.g. 'e+42'). The exponent is not padded to a fixed width.
      */
     case AsciiLowerCaseE;
 
     /**
      * ASCII upper-case E notation (e.g. 'E+42'). The exponent is not padded to a fixed width. Matches the
-     * scientific notation PHP itself falls back to when casting a float to string (e.g. (string) 1.5e20 ===
-     * '1.5E+20'), including the explicit sign.
+     * scientific notation PHP itself uses when casting a float to string (e.g. (string) 1.5e20 === '1.5E+20'),
+     * including the explicit sign.
      */
     case AsciiUpperCaseE;
 
@@ -48,7 +48,7 @@ enum ExponentFormat
      * by hand (e.g. '×10³', not '×10+3').
      *
      * @param int $exponent The exponent (may be negative, zero, or positive).
-     * @return string The rendered exponent, e.g. 'e+42', 'E-42', '*10^42', '×10⁴²', '&times;10<sup>42</sup>'.
+     * @return string The rendered exponential part, e.g. 'e+42', 'E-42', '*10^42', '×10⁴²', '&times;10<sup>42</sup>'.
      */
     public function format(int $exponent): string
     {

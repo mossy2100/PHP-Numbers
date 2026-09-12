@@ -42,15 +42,14 @@ suitable for floating-point values.
 
 **Implementation Guidelines:**
 
-- Check the type of `$other` explicitly (typically `instanceof self`) - don't attempt to convert or coerce it,
-  matching `equal()`'s contract (see [Equatable.md](Equatable.md)).
+- Check the type of `$other` explicitly (typically `instanceof self`). Don't attempt to convert or coerce it. This matches `equal()`'s contract (see [Equatable.md](Equatable.md)).
 - Throw (typically `InvalidArgumentException`) for any type that isn't a deliberate, documented exception to
   same-type-only comparison.
 - Use `Floats::approxEqual()` for the actual float comparisons: it checks absolute tolerance first (`|a - b| ≤
   absTol`, useful near zero), then relative tolerance (`|a - b| ≤ relTol * max(|a|, |b|)`, which scales with
   magnitude).
 - For composite types, check each component separately with the same tolerances.
-- Passing `$relTol = 0.0, $absTol = 0.0` is equivalent to exact equality - callers who want that should use
+- Passing `$relTol = 0.0, $absTol = 0.0` is equivalent to exact equality. Callers who want that should use
   `equal()` instead.
 
 ---

@@ -100,7 +100,7 @@ final class Arrays
     public static function toSerialList(array $arr, string $conjunction = 'and', bool $oxford = true): string
     {
         // Convert to list array.
-        $arr = array_values($arr);
+        $values = [];
 
         // Ensure all values are strings.
         foreach ($arr as $value) {
@@ -109,16 +109,17 @@ final class Arrays
                     'Invalid array value type: ' . get_debug_type($value) . '. Must be string.'
                 );
             }
+            $values[] = $value;
         }
 
         $nItems = count($arr);
 
         return match ($nItems) {
             0 => '',
-            1 => $arr[0],
-            2 => $arr[0] . " $conjunction " . $arr[1],
-            default => implode(', ', array_slice($arr, 0, -1)) . ($oxford ? ',' : '') . " $conjunction " .
-                $arr[$nItems - 1],
+            1 => $values[0],
+            2 => $values[0] . " $conjunction " . $values[1],
+            default => implode(', ', array_slice($values, 0, -1)) . ($oxford ? ',' : '') . " $conjunction " .
+                $values[$nItems - 1],
         };
     }
 

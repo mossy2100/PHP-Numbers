@@ -48,7 +48,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   usable and testable.
 - **`Floats::getExponent()`** — returns a float's base-10 exponent as if written in normalized scientific notation
   (a single non-zero digit before the decimal point). Computed via `floor(log10(abs($value)))`, verified and
-  adjusted by one if needed to guard against `log10()` rounding error at exact powers of 10.
+  adjusted by one if needed to guard against `log10()` rounding error at exact powers of 10. Throws
+  `DomainException` for a non-finite value.
 - **`Environment::getLocale()`** — auto-detects the locale from the HTTP `Accept-Language` header, falling back to
   PHP's current default (`Locale::getDefault()`, which always returns a value). Also adds
   **`Environment::INVARIANT_LOCALE`** (`'en_US_POSIX'`), used internally by `Floats::format()` for deterministic,
@@ -96,8 +97,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - `Stringify::stringifyResource()`: `'Invalid value type: {type}. Must be a resource.'`.
   - `Stringify::stringifyString()`: undetectable/unconvertible encoding messages simplified to `'String encoding
     cannot be detected.'` / `'String cannot be converted to UTF-8.'` (previously repeated "was not UTF-8" in both).
-  - `Types::usesTrait()`/`getTraits()`: `'Invalid class name: {name}. Must be a class, interface, or trait.'`
-    (previously quoted the name and didn't state the constraint).
+  - `Types::usesTrait()`/`getTraits()`: `"Invalid class name: '{name}'. Must be a class, interface, or trait."`
+    (previously didn't state the constraint).
 - **`Stringify::setIndent()`** now accepts `0` (previously required `> 0`); the indent must simply be non-negative.
   Both `setIndent()` and **`Stringify::setMaxLineLength()`** now throw `DomainException` instead of
   `InvalidArgumentException` for invalid values, consistent with the package's exception conventions (see
@@ -162,6 +163,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **`Environment::getLocale()`**: the `Accept-Language` header check used `!empty(...)`, which would silently treat
   a non-string header value (e.g. an array, in principle possible via `$_SERVER`) as usable input. Now explicitly
   checks `isset(...) && is_string(...)`.
+- **`Floats::wrap()`**: a non-finite or non-positive `$unitsPerTurn` (e.g. `0.0`, a negative value, or `NAN`) was
+  silently accepted, producing `NAN` or an output outside either documented range instead of failing loudly. Now
+  throws `DomainException`, consistent with the other parameter-validating methods in this class.
 
 ### Removed
 

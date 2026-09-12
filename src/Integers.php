@@ -359,7 +359,7 @@ final class Integers
         $chars = mb_str_split($s);
         foreach ($chars as $char) {
             if (!isset($reverseMap[$char])) {
-                throw new FormatException("Invalid $style character: $char.");
+                throw new FormatException("Invalid $style character: '$char'.");
             }
             $intString .= $reverseMap[$char];
         }

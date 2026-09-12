@@ -10,8 +10,7 @@ Exception thrown when an arithmetic operation has no defined result for the give
 other operations that are undefined for specific inputs.
 
 For a plain `float`, PHP signals these cases by returning `NAN` or `±INF`. Value types with no such sentinel to fall
-back on - `Complex`, `Rational`, `Vector`, `Matrix`, and similar exact/structured numeric types - throw this exception
-instead.
+back on, such as `Complex`, `Rational`, `Vector`, `Matrix`, and similar exact/structured numeric types, throw this exception instead.
 
 The exception extends `DomainException`, so it's still caught by any existing `catch (DomainException)` code, while
 allowing more specific handling of undefined-operation failures.
@@ -80,8 +79,8 @@ Use other exceptions when:
 
 - The argument is the wrong type entirely (use `InvalidArgumentException`).
 - The value is out of the valid domain but the operation itself is well-defined for other operands of the same shape
-  (e.g. negative dimensions, wrong shape for construction - use `DomainException` directly).
-- A native PHP division (`/`) or `intdiv()` on already-validated operands would throw `DivisionByZeroError` - guard
+  (e.g. negative dimensions, wrong shape for construction; in these cases, use `DomainException` directly).
+- A native PHP division (`/`) or `intdiv()` on already-validated operands would throw `DivisionByZeroError`. Guard
   against zero explicitly and throw `ArithmeticException` instead, rather than letting the native error propagate.
 
 ---

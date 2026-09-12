@@ -1,6 +1,6 @@
 # ExponentFormat
 
-Rendering styles for the exponent portion of scientific-notation float output.
+Rendering styles for the exponential part of scientific-notation float output.
 
 ---
 
@@ -95,9 +95,7 @@ exponents and show only `'-'` for negative ones, matching how scientific notatio
 
 - `$exponent` (`int`) — The exponent (may be negative, zero, or positive).
 
-**Returns:**
-
-- `string` — The rendered exponent, e.g. `'e+42'`, `'E-42'`, `'*10^42'`, `'×10⁴²'`, `'&times;10<sup>42</sup>'`.
+**Returns:** `string` - The rendered exponential part, e.g. `'e+42'`, `'E-42'`, `'*10^42'`, `'×10⁴²'`, `'&times;10<sup>42</sup>'`.
 
 **Examples:**
 
@@ -135,6 +133,6 @@ Floats::format(1500.0, precision: 2, format: FloatFormat::Scientific, expFormat:
 ## See Also
 
 - **[Floats](../Floats.md)** — `format()` is where `ExponentFormat` is used, via the `$expFormat` parameter.
-- **[FloatFormat](FloatFormat.md)** — Selects whether an exponent is used at all.
+- **[FloatFormat](FloatFormat.md)** — Selects whether an exponential part is used at all.
 - **[Integers](../Integers.md)** — `toSuperscript()` is used internally by `UnicodeMath` to render the exponent's
   digits.

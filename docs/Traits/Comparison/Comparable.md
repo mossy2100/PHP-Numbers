@@ -9,7 +9,7 @@ Trait providing comparison operations for objects with natural ordering.
 The `Comparable` trait provides a complete set of comparison methods based on a single `compare()` method that you
 implement. It uses the `Equatable` trait and adds ordering methods.
 
-The trait follows the **Template Method Pattern** - you implement the `compare()` method, and all other methods are
+The trait follows the **Template Method Pattern**: you implement the `compare()` method, and all other methods are
 automatically provided.
 
 | Name                   | Description                       | Implementation                      |
@@ -47,9 +47,9 @@ abstract public function compare(mixed $other): int
 
 - Must return **exactly** -1, 0, or 1 (not just negative/zero/positive). The convenience methods use strict
   equality checks. Use `Numbers::sign()` to normalize the spaceship operator's result.
-- Check the type of `$other` explicitly (typically `instanceof self`) - don't attempt to convert or coerce it.
+- Check the type of `$other` explicitly (typically `instanceof self`). Don't attempt to convert or coerce it.
 - Throw (typically `InvalidArgumentException`) for any type that isn't a deliberate, documented exception to
-  same-type-only comparison - see [Equatable.md](Equatable.md) for the reasoning.
+  same-type-only comparison. See [Equatable.md](Equatable.md) for the reasoning.
 
 ---
 
@@ -61,7 +61,7 @@ abstract public function compare(mixed $other): int
 public function equal(mixed $other): bool
 ```
 
-Check if this object equals another. Provided by the trait - delegates to `compare()`. Returns `true` only if
+Check if this object equals another. Provided by the trait, delegating to `compare()`. Returns `true` only if
 `compare()` returns `0`. Propagates whatever `compare()` throws for incompatible types.
 
 ### lessThan(), lessThanOrEqual(), greaterThan(), greaterThanOrEqual()

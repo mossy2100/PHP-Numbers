@@ -10,18 +10,19 @@ namespace OceanMoon\Core\Enums;
 enum FloatFormat
 {
     /**
-     * Use a decimal point, with no exponent.
+     * Use a decimal point, with no exponential part.
      */
     case FixedPoint;
 
     /**
-     * Include an exponent.
+     * Include an exponential part.
      */
     case Scientific;
 
     /**
-     * Use whichever of FixedPoint or Scientific produces the more useful string: the one with more significant
-     * figures, unless that comes with too many leading or trailing zeros.
+     * Use whichever of FixedPoint or Scientific produces the more useful string. FixedPoint is preferred unless:
+     * 1. Scientific would show more significant figures, or
+     * 2. FixedPoint would show more than 3 leading or trailing zeros.
      */
     case Auto;
 }

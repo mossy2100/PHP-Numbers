@@ -42,14 +42,14 @@ abstract public function equal(mixed $other): bool
 
 **Implementation Guidelines:**
 
-- Check the type of `$other` explicitly (typically `instanceof self`) - don't attempt to convert or coerce it.
+- Check the type of `$other` explicitly (typically `instanceof self`). Don't attempt to convert or coerce it.
 - Throw (typically `InvalidArgumentException`) for any type that isn't a deliberate, documented exception to
   same-type-only comparison. Only widen to accept a related type where there's a genuine mathematical
   justification (e.g. `Complex` and `int`/`float`), and document it.
 - Should be reflexive, symmetric, and transitive.
 - For floating-point types, use `ApproxEquatable` alongside this trait.
 
-**Throws:** Typically `InvalidArgumentException` for an incompatible type - see Implementation Guidelines above.
+**Throws:** Typically `InvalidArgumentException` for an incompatible type. See Implementation Guidelines above.
 
 ---
 

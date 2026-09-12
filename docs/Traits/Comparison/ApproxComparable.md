@@ -48,7 +48,7 @@ abstract public function approxEqual(
 
 Both abstract methods should check the type of `$other` explicitly (typically `instanceof self`) and throw
 (typically `InvalidArgumentException`) for anything that isn't a deliberate, documented exception to
-same-type-only comparison - see [Equatable.md](Equatable.md) for the reasoning.
+same-type-only comparison. See [Equatable.md](Equatable.md) for the reasoning.
 
 ---
 

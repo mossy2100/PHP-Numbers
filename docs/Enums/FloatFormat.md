@@ -22,7 +22,7 @@ This is a pure (unbacked) enum. Its cases carry no value — they're purely sele
 case FixedPoint;
 ```
 
-Use a decimal point, with no exponent (e.g. `'1234.5'`).
+Use a decimal point, with no exponential part (e.g. `'1234.5'`).
 
 ### Scientific
 
@@ -30,8 +30,7 @@ Use a decimal point, with no exponent (e.g. `'1234.5'`).
 case Scientific;
 ```
 
-Always include an exponent (e.g. `'1.2345×10³'`), rendered per the [`ExponentFormat`](ExponentFormat.md) passed to
-`Floats::format()`.
+Always include an exponential part (e.g. `'1.2345×10³'`), rendered per the [`ExponentFormat`](ExponentFormat.md) passed to `Floats::format()`.
 
 ### Auto
 
@@ -41,8 +40,16 @@ case Auto;
 
 Whichever of `FixedPoint` or `Scientific` produces the more useful string. This is `Floats::format()`'s default.
 
-`FixedPoint` is preferred unless `Scientific` has fewer significant figures, or `FixedPoint` would need more than 3
-leading or trailing zeros.
+`FixedPoint` is preferred unless:
+1. `Scientific` would show more significant figures, or
+2. `FixedPoint` would show more than 3 leading or trailing zeros.
+
+| Value    | Result   | Chosen       | Why              |
+| -------- | -------- | ------------ | ---------------- |
+| `1000`   | `1000`   | `FixedPoint` | 3 trailing zeros |
+| `10000`  | `1×10⁴`  | `Scientific` | 4 trailing zeros |
+| `0.001`  | `0.001`  | `FixedPoint` | 3 leading zeros  |
+| `0.0001` | `1×10⁻⁴` | `Scientific` | 4 leading zeros  |
 
 ---
 

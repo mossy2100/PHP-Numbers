@@ -584,7 +584,7 @@ class Console
         // Guard against zero-length substring.
         $chLen = mb_strlen($ch);
         if ($chLen === 0) {
-            throw new DomainException('Horizontal rule character cannot be empty.');
+            throw new DomainException('Horizontal rule character must not be empty.');
         }
 
         $n = (int) ceil($length / $chLen);
